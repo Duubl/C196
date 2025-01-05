@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Toolbar at the top -->
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary"
+        android:padding="8dp"
+        android:title="Toolbar"
+        android:titleTextColor="@android:color/white">
+
+        <ImageButton
+            android:id="@+id/toolbar_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:scaleX="0.50"
+            android:scaleY="0.50"
+            app:srcCompat="@drawable/hamburger_icon" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Content goes below the toolbar -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp" >
+    </FrameLayout>
+</LinearLayout>

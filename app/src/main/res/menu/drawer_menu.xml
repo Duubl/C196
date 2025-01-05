@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_terms"
+        android:icon="@drawable/term_icon"
+        android:title="Terms" />
+    <item
+        android:id="@+id/nav_courses"
+        android:icon="@drawable/courses_icon"
+        android:title="Courses" />
+    <item
+        android:id="@+id/nav_assessments"
+        android:icon="@drawable/assessments_icon"
+        android:title="Assessments" />
+    <item
+        android:id="@+id/nav_instructors"
+        android:icon="@drawable/assessments_icon"
+        android:title="Instructors" />
+</menu>
