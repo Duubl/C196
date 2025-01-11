@@ -4,12 +4,20 @@
     android:layout_height="match_parent">
 
     <!-- Container for the instructor buttons -->
-    <LinearLayout
-        android:id="@+id/instructor_list_layout"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginTop="?attr/actionBarSize" />
+        android:fillViewport="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/instructor_list_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:orientation="vertical" />
+    </ScrollView>
 
     <!-- Toolbar at the top -->
     <androidx.appcompat.widget.Toolbar
