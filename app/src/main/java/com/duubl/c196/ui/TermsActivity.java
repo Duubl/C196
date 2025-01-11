@@ -1,15 +1,28 @@
 package com.duubl.c196.ui;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.duubl.c196.R;
 
+import java.util.Calendar;
+
 public class TermsActivity extends AppCompatActivity {
+
+    private Button new_term_button;
+    private LinearLayout terms_layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +35,97 @@ public class TermsActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        new_term_button = findViewById(R.id.new_term_button);
+        new_term_button.setOnClickListener(item -> {
+            openInputDialog();
+        });
+    }
+
+    private void openInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("New Term");
+
+        // Create a layout for the input fields
+        LinearLayout inputLayout = new LinearLayout(this);
+        inputLayout.setOrientation(LinearLayout.VERTICAL);
+        inputLayout.setPadding(16, 16, 16, 16);
+
+        // Input field for the term name
+        final EditText termInput = new EditText(this);
+        termInput.setHint("Enter term name");
+        inputLayout.addView(termInput);
+
+        // TextView and DatePicker for the start date
+        final TextView startDateText = new TextView(this);
+        startDateText.setText("Start Date:");
+        inputLayout.addView(startDateText);
+
+        final Button startDateButton = new Button(this);
+        startDateButton.setText("Select Start Date");
+        inputLayout.addView(startDateButton);
+
+        final Calendar[] startDate = new Calendar[1];
+        startDateButton.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                calendar.set(year, month, dayOfMonth);
+                startDate[0] = calendar;
+                startDateButton.setText(String.format("%d/%d/%d", month + 1, dayOfMonth, year));
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        // TextView and DatePicker for the end date
+        final TextView endDateText = new TextView(this);
+        endDateText.setText("End Date:");
+        inputLayout.addView(endDateText);
+
+        final Button endDateButton = new Button(this);
+        endDateButton.setText("Select End Date");
+        inputLayout.addView(endDateButton);
+
+        final Calendar[] endDate = new Calendar[1];
+        endDateButton.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                calendar.set(year, month, dayOfMonth);
+                endDate[0] = calendar;
+                endDateButton.setText(String.format("%d/%d/%d", month + 1, dayOfMonth, year));
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        builder.setView(inputLayout);
+
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String termName = termInput.getText().toString().trim();
+            if (termName.isEmpty() || startDate[0] == null || endDate[0] == null) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Creates the new button
+            createTermButton(termName);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void createTermButton(String termName) {
+        terms_layout = findViewById(R.id.terms_list_layout);
+        Button termButton = new Button(this);
+        termButton.setText(termName);
+        termButton.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        termButton.setOnClickListener(v -> {
+            // TODO: Change toast. Temporary to show button click working.
+            Toast.makeText(this, "Clicked: " + termName, Toast.LENGTH_SHORT).show();
+        });
+
+        terms_layout.addView(termButton);
     }
 
     @Override

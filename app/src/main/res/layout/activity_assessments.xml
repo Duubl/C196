@@ -3,13 +3,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:id="@+id/terms_list_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginTop="?attr/actionBarSize" />
-
     <!-- Toolbar at the top -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -25,7 +18,7 @@
 
     <!-- Button at the bottom -->
     <Button
-        android:id="@+id/new_term_button"
+        android:id="@+id/new_assessment_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/Base.Theme.C196"

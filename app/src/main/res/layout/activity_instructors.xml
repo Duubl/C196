@@ -1,14 +1,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/new_course_button"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <LinearLayout
-        android:id="@+id/terms_list_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginTop="?attr/actionBarSize" />
+    android:layout_height="match_parent">
 
     <!-- Toolbar at the top -->
     <androidx.appcompat.widget.Toolbar
@@ -19,18 +13,18 @@
         android:background="@color/primary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Button at the bottom -->
     <Button
-        android:id="@+id/new_term_button"
+        android:id="@+id/new_instructor_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Base.Theme.C196"
         android:text="+"
         android:textColorLink="@color/primary"
+        android:theme="@style/Base.Theme.C196"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

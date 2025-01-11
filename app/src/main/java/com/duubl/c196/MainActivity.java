@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.duubl.c196.entities.Course;
 import com.duubl.c196.ui.AssessmentsActivity;
 import com.duubl.c196.ui.CoursesActivity;
 import com.duubl.c196.ui.InstructorsActivity;
@@ -51,24 +52,20 @@ public class MainActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            Intent i = null;
             if (itemId == R.id.nav_home) {
-                i = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             } else if (itemId == R.id.nav_terms) {
-                i = new Intent(getApplicationContext(), TermsActivity.class);
+                startActivity(new Intent(getApplicationContext(), TermsActivity.class));
             } else if (itemId == R.id.nav_courses) {
-                i = new Intent(getApplicationContext(), CoursesActivity.class);
+                startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
             } else if (itemId == R.id.nav_instructors) {
-                i = new Intent(getApplicationContext(), InstructorsActivity.class);
+                startActivity(new Intent(getApplicationContext(), InstructorsActivity.class));
             } else if (itemId == R.id.nav_assessments) {
-                i = new Intent(getApplicationContext(), AssessmentsActivity.class);
-            }
-            drawerLayout.closeDrawers();
-            if (i != null) {
-                startActivity(i);
+                startActivity(new Intent(getApplicationContext(), AssessmentsActivity.class));
             } else {
                 Log.e("NavigationDrawer", "No Intent created for the selected item");
             }
+            drawerLayout.closeDrawers();
             return true;
         });
 
