@@ -3,8 +3,9 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Container for the term buttons -->
     <LinearLayout
-        android:id="@+id/terms_list_layout"
+        android:id="@+id/term_list_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"

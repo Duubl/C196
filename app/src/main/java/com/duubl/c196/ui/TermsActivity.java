@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -123,7 +122,7 @@ public class TermsActivity extends AppCompatActivity {
 
     private void createTermButton(String termName) {
         // TODO: Create term buttons for each term already stored in the database
-        terms_layout = findViewById(R.id.terms_list_layout);
+        terms_layout = findViewById(R.id.term_list_layout);
         Button termButton = new Button(this);
         termButton.setText(termName);
         termButton.setLayoutParams(new LinearLayout.LayoutParams(

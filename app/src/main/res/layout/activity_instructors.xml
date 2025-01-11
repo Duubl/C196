@@ -1,8 +1,15 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/new_course_button"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <!-- Container for the instructor buttons -->
+    <LinearLayout
+        android:id="@+id/instructor_list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="?attr/actionBarSize" />
 
     <!-- Toolbar at the top -->
     <androidx.appcompat.widget.Toolbar
