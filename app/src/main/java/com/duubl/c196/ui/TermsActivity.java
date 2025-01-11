@@ -24,7 +24,6 @@ public class TermsActivity extends AppCompatActivity {
 
     private Button new_term_button;
     private LinearLayout terms_layout;
-    private ArrayList<Term> terms = new ArrayList<Term>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

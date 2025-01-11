@@ -1,6 +1,7 @@
 package com.duubl.c196.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,11 +14,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.duubl.c196.R;
+import com.duubl.c196.database.Repository;
+import com.duubl.c196.entities.Instructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class InstructorsActivity extends AppCompatActivity {
 
     private Button new_instructor_button;
     private LinearLayout instructor_layout;
+    private Repository repository;
+    private List<Instructor> instructors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +44,17 @@ public class InstructorsActivity extends AppCompatActivity {
         new_instructor_button.setOnClickListener(item -> {
             openInputDialog();
         });
+
+        repository = new Repository(getApplication());
+        try {
+            instructors = repository.getAllInstructors();
+        } catch (InterruptedException e) {
+            Log.e("InstructorsActivity", "there are no instructors!");
+            throw new RuntimeException(e);
+        }
+        for (Instructor instructor : instructors) {
+            createInstructorButton(instructor.getInstructor_name());
+        }
     }
 
     private void openInputDialog() {
@@ -74,6 +93,11 @@ public class InstructorsActivity extends AppCompatActivity {
                 return;
             }
 
+            try {
+                createNewInstructor(instructorName, instructorPhone, instructorEmail);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             createInstructorButton(instructorName);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
@@ -81,8 +105,13 @@ public class InstructorsActivity extends AppCompatActivity {
         builder.show();
     }
 
+    private void createNewInstructor(String name, String phone, String email) throws InterruptedException {
+        repository = new Repository(getApplication());
+        Instructor instructor = new Instructor(0, 0, name, phone, email);
+        repository.insert(instructor);
+    }
+
     private void createInstructorButton(String instructorName) {
-        // TODO: Create instructor buttons for each term already stored in the database
         instructor_layout = findViewById(R.id.instructor_list_layout);
         Button instructorButton = new Button(this);
         instructorButton.setText(instructorName);
@@ -106,12 +135,5 @@ public class InstructorsActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        // TODO: Populate with information stored in arraylist containing terms
     }
 }

@@ -13,6 +13,14 @@ public class Instructor {
     private String instructor_phone;
     private String instructor_email;
 
+    public Instructor(int instructor_id, int course_id, String instructor_name, String instructor_phone, String instructor_email) {
+        this.instructor_id = instructor_id;
+        this.course_id = course_id;
+        this.instructor_name = instructor_name;
+        this.instructor_phone = instructor_phone;
+        this.instructor_email = instructor_email;
+    }
+
     public int getInstructor_id() {
         return instructor_id;
     }
