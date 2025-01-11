@@ -46,17 +46,14 @@ public class TermsActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New Term");
 
-        // Create a layout for the input fields
         LinearLayout inputLayout = new LinearLayout(this);
         inputLayout.setOrientation(LinearLayout.VERTICAL);
         inputLayout.setPadding(16, 16, 16, 16);
 
-        // Input field for the term name
         final EditText termInput = new EditText(this);
         termInput.setHint("Enter term name");
         inputLayout.addView(termInput);
 
-        // TextView and DatePicker for the start date
         final TextView startDateText = new TextView(this);
         startDateText.setText("Start Date:");
         inputLayout.addView(startDateText);
@@ -75,7 +72,6 @@ public class TermsActivity extends AppCompatActivity {
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
         });
 
-        // TextView and DatePicker for the end date
         final TextView endDateText = new TextView(this);
         endDateText.setText("End Date:");
         inputLayout.addView(endDateText);
@@ -103,7 +99,6 @@ public class TermsActivity extends AppCompatActivity {
                 return;
             }
 
-            // Creates the new button
             createTermButton(termName);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
