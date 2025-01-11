@@ -1,5 +1,6 @@
 package com.duubl.c196.ui;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -39,6 +40,11 @@ public class InstructorsActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        instructor_layout = findViewById(R.id.instructor_list_layout);
+        instructor_layout.setOrientation(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                ? LinearLayout.HORIZONTAL
+                : LinearLayout.VERTICAL);
 
         new_instructor_button = findViewById(R.id.new_instructor_button);
         new_instructor_button.setOnClickListener(item -> {
@@ -115,10 +121,21 @@ public class InstructorsActivity extends AppCompatActivity {
         instructor_layout = findViewById(R.id.instructor_list_layout);
         Button instructorButton = new Button(this);
         instructorButton.setText(instructorName);
-        instructorButton.setLayoutParams(new LinearLayout.LayoutParams(
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
+        );
+
+        if (instructor_layout.getOrientation() == LinearLayout.HORIZONTAL) {
+            params = new LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1f
+            );
+        }
+
+        instructorButton.setLayoutParams(params);
 
         instructorButton.setOnClickListener(v -> {
             // TODO: Change toast. Temporary to show button click working.
