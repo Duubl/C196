@@ -16,13 +16,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.duubl.c196.R;
+import com.duubl.c196.entities.Term;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class TermsActivity extends AppCompatActivity {
 
     private Button new_term_button;
     private LinearLayout terms_layout;
+    private ArrayList<Term> terms = new ArrayList<Term>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,13 @@ public class TermsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Opens the input dialog for the new term information.
+     * Accepts input for a name, start, end dates and a list of courses.
+     */
+
+    // TODO: Add the ability to add courses to the term
+
     private void openInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New Term");
@@ -50,10 +60,12 @@ public class TermsActivity extends AppCompatActivity {
         inputLayout.setOrientation(LinearLayout.VERTICAL);
         inputLayout.setPadding(16, 16, 16, 16);
 
+        // Get term name
         final EditText termInput = new EditText(this);
         termInput.setHint("Enter term name");
         inputLayout.addView(termInput);
 
+        // Get start date
         final TextView startDateText = new TextView(this);
         startDateText.setText("Start Date:");
         inputLayout.addView(startDateText);
@@ -72,6 +84,7 @@ public class TermsActivity extends AppCompatActivity {
             }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
         });
 
+        // Get end date
         final TextView endDateText = new TextView(this);
         endDateText.setText("End Date:");
         inputLayout.addView(endDateText);
@@ -92,6 +105,8 @@ public class TermsActivity extends AppCompatActivity {
 
         builder.setView(inputLayout);
 
+        // Creates the button on submit if all fields contain information.
+        // TODO: Add error checking and proper formatting checking
         builder.setPositiveButton("Add", (dialog, which) -> {
             String termName = termInput.getText().toString().trim();
             if (termName.isEmpty() || startDate[0] == null || endDate[0] == null) {
@@ -107,6 +122,7 @@ public class TermsActivity extends AppCompatActivity {
     }
 
     private void createTermButton(String termName) {
+        // TODO: Create term buttons for each term already stored in the database
         terms_layout = findViewById(R.id.terms_list_layout);
         Button termButton = new Button(this);
         termButton.setText(termName);
@@ -130,5 +146,12 @@ public class TermsActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // TODO: Populate with information stored in arraylist containing terms
     }
 }

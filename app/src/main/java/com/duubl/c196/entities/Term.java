@@ -25,19 +25,9 @@ public class Term {
         return this.term_id;
     }
 
-    /**
-     * Sets the term name
-     * @param name the name to be set
-     */
-
     public void setTermName(String name) {
         this.term_name = name;
     }
-
-    /**
-     * Gets the term name
-     * @return the term name
-     */
 
     public String getTerm_name() {
         return this.term_name;
