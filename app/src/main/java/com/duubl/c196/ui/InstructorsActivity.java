@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +19,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.duubl.c196.R;
@@ -23,14 +27,18 @@ import com.duubl.c196.database.Repository;
 import com.duubl.c196.entities.Instructor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class InstructorsActivity extends AppCompatActivity {
 
-    private Button new_instructor_button;
-    private LinearLayout instructor_layout;
+    private Button newInstructorButton;
+    private LinearLayout instructorLayout;
     private Repository repository;
     private List<Instructor> instructors;
+
+    // HashMap to store the expanded states of the cards. Helpful for changing orientation of the phone.
+    private HashMap<Integer, Boolean> expandedStates = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +54,15 @@ public class InstructorsActivity extends AppCompatActivity {
         }
 
         // Layout for the list of instructors.
-        instructor_layout = findViewById(R.id.instructor_list_layout);
-        instructor_layout.setOrientation(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-                ? LinearLayout.HORIZONTAL
-                : LinearLayout.VERTICAL);
+        instructorLayout = findViewById(R.id.instructor_list_layout);
+        if (instructorLayout == null) {
+            Log.e("InstructorsActivity", "instructorLayout is null!");
+            return;
+        }
 
         // New instructor button
-        new_instructor_button = findViewById(R.id.new_instructor_button);
-        new_instructor_button.setOnClickListener(item -> {
+        newInstructorButton = findViewById(R.id.new_instructor_button);
+        newInstructorButton.setOnClickListener(item -> {
             openInputDialog();
         });
 
@@ -65,9 +74,11 @@ public class InstructorsActivity extends AppCompatActivity {
             Log.e("InstructorsActivity", "there are no instructors!");
             throw new RuntimeException(e);
         }
-        for (Instructor instructor : instructors) {
-            createInstructorButton(instructor.getInstructor_name(), instructor.getInstructor_phone(), instructor.getInstructor_email());
-        }
+        populateInstructorCards();
+
+        instructorLayout.post(()-> {
+            adjustLayoutOrientation(getResources().getConfiguration().orientation);
+        });
     }
 
     /**
@@ -118,7 +129,8 @@ public class InstructorsActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            createInstructorButton(instructorName, instructorPhone, instructorEmail);
+            Log.d("InstructorsActivity", "Sent data to create new instructor " + instructorName);
+            populateInstructorCards();
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
@@ -134,19 +146,20 @@ public class InstructorsActivity extends AppCompatActivity {
      */
 
     private void createNewInstructor(String name, String phone, String email) throws InterruptedException {
+        Log.d("InstructorsActivity", "Created a new instructor: " + name);
         repository = new Repository(getApplication());
         Instructor instructor = new Instructor(0, 0, name, phone, email);
         repository.insert(instructor);
+        instructors.add(instructor);
     }
 
     /**
      * Creates the button for the instructor.
-     * @param name the name of the instructor to be displayed on the button
-     * @param phone the phone number of the instructor
-     * @param email the email of the instructor
+     * @param instructor the instructor to have the button created for
      */
 
-    private void createInstructorButton(String name, String phone, String email) {
+    private void createInstructorButton(Instructor instructor) {
+        Log.d("InstructorsActivity", "instructor " + instructor.getInstructor_name() + " button created!");
         LinearLayout parentLayout = findViewById(R.id.instructor_list_layout);
 
         CardView cardView = new CardView(this);
@@ -169,7 +182,7 @@ public class InstructorsActivity extends AppCompatActivity {
 
         // Create button
         Button instructorButton = new Button(this);
-        instructorButton.setText(name);
+        instructorButton.setText(instructor.getInstructor_name());
         instructorButton.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -180,7 +193,7 @@ public class InstructorsActivity extends AppCompatActivity {
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
         expandableLayout.setOrientation(LinearLayout.VERTICAL);
-        expandableLayout.setVisibility(View.GONE);
+        expandableLayout.setVisibility(expandedStates.getOrDefault(instructor.getInstructor_id(), false) ? View.VISIBLE : View.GONE);
         expandableLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -189,11 +202,11 @@ public class InstructorsActivity extends AppCompatActivity {
 
         // Add details to the expandable section
         TextView emailTextView = new TextView(this);
-        emailTextView.setText("Email: " + email);
+        emailTextView.setText("Email: " + instructor.getInstructor_email());
         expandableLayout.addView(emailTextView);
 
         TextView phoneTextView = new TextView(this);
-        phoneTextView.setText("Phone: " + phone);
+        phoneTextView.setText("Phone: " + instructor.getInstructor_phone());
         expandableLayout.addView(phoneTextView);
 
         // TODO: Add assigned courses to instructors
@@ -204,11 +217,9 @@ public class InstructorsActivity extends AppCompatActivity {
 
         // Button click listener to toggle expandable layout
         instructorButton.setOnClickListener(v -> {
-            if (expandableLayout.getVisibility() == View.GONE) {
-                expandableLayout.setVisibility(View.VISIBLE);
-            } else {
-                expandableLayout.setVisibility(View.GONE);
-            }
+            boolean isExpanded = expandableLayout.getVisibility() == View.VISIBLE;
+            expandableLayout.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
+            expandedStates.put(instructor.getInstructor_id(), !isExpanded);
         });
 
         // Add button and expandable layout to the card layout
@@ -222,6 +233,71 @@ public class InstructorsActivity extends AppCompatActivity {
         parentLayout.addView(cardView);
     }
 
+    /**
+     * Populates the instructor cards in the activity.
+     */
+
+    private void populateInstructorCards() {
+        if (instructorLayout != null) {
+            instructorLayout.removeAllViews();
+        }
+
+        for (Instructor instructor : instructors) {
+            createInstructorButton(instructor);
+        }
+    }
+
+    /**
+     * Adjusts the layout orientation when switching from portrait to landscape & vice-versa.
+     * @param orientation the orientation
+     */
+
+    private void adjustLayoutOrientation(int orientation) {
+        Log.d("InstructorsActivity", "Adjusting layout orientation: " + orientation);
+
+        LinearLayout instructorLayout = findViewById(R.id.instructor_list_layout);
+        if (instructorLayout == null) {
+            Log.e("InstructorsActivity", "instructorLayout is null!");
+            return;
+        }
+
+        ScrollView scrollView = findViewById(R.id.scroll_view);
+
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // Change the orientation to horizontal in landscape mode
+            instructorLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+            HorizontalScrollView horizontalScrollView = new HorizontalScrollView(this);
+            horizontalScrollView.setId(R.id.scroll_view);
+            horizontalScrollView.addView(instructorLayout);
+
+            // Get the parent constraint layout and replace the current ScrollView
+            ConstraintLayout parent = findViewById(R.id.constraint_layout);
+            if (parent != null) {
+                parent.removeView(scrollView);
+                parent.addView(horizontalScrollView);
+            }
+
+        } else {
+            // Change the orientation to vertical in portrait mode
+            instructorLayout.setOrientation(LinearLayout.VERTICAL);
+
+            // Ensure ScrollView is used for portrait mode
+            if (!(scrollView instanceof ScrollView)) {
+                ScrollView verticalScrollView = new ScrollView(this);
+                verticalScrollView.setId(R.id.scroll_view);
+                verticalScrollView.addView(instructorLayout);
+
+                // Get the parent constraint layout and replace the current ScrollView
+                ConstraintLayout parent = findViewById(R.id.constraint_layout);
+                if (parent != null) {
+                    parent.removeView(scrollView);
+                    parent.addView(verticalScrollView);
+                }
+            }
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -229,5 +305,26 @@ public class InstructorsActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("expandedStates", expandedStates);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            expandedStates = (HashMap<Integer, Boolean>) savedInstanceState.getSerializable("expandedStates");
+        }
+        populateInstructorCards();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        adjustLayoutOrientation(newConfig.orientation);
     }
 }
