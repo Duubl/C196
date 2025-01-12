@@ -48,4 +48,7 @@ dependencies {
 
     // Java language implementation
     implementation(libs.fragment)
+
+    // CardView
+    implementation(libs.cardview)
 }

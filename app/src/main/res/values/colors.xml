@@ -2,8 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary">#73956F</color>
-    <color name="primary_variant">#7BAE7F</color>
-    <color name="secondary">#95D7AE</color>
+    <color name="primary">#66b2a0</color>
+    <color name="primary_variant">#4e796b</color>
+    <color name="secondary">#a7d7b8</color>
+    <color name="secondary_variant">#a7d7b8</color>
+    <color name="tertiary">#e1eae5</color>
+    <color name="tertiary_variant">#f8f6f1</color>
     <color name="charcoal">#454851</color>
 </resources>
