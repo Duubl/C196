@@ -75,10 +75,6 @@ public class InstructorsActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
         populateInstructorCards();
-
-        instructorLayout.post(()-> {
-            adjustLayoutOrientation(getResources().getConfiguration().orientation);
-        });
     }
 
     /**
@@ -146,7 +142,6 @@ public class InstructorsActivity extends AppCompatActivity {
      */
 
     private void createNewInstructor(String name, String phone, String email) throws InterruptedException {
-        Log.d("InstructorsActivity", "Created a new instructor: " + name);
         repository = new Repository(getApplication());
         Instructor instructor = new Instructor(0, 0, name, phone, email);
         repository.insert(instructor);
@@ -159,14 +154,18 @@ public class InstructorsActivity extends AppCompatActivity {
      */
 
     private void createInstructorButton(Instructor instructor) {
-        Log.d("InstructorsActivity", "instructor " + instructor.getInstructor_name() + " button created!");
         LinearLayout parentLayout = findViewById(R.id.instructor_list_layout);
+        parentLayout.setPadding(parentLayout.getPaddingLeft(),
+                parentLayout.getPaddingTop(),
+                parentLayout.getPaddingRight(),
+                (instructors.size()*36));
 
         CardView cardView = new CardView(this);
         cardView.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
+
         cardView.setCardElevation(8);
         cardView.setRadius(16);
         cardView.setPadding(16, 16, 16, 16);
@@ -220,6 +219,11 @@ public class InstructorsActivity extends AppCompatActivity {
             boolean isExpanded = expandableLayout.getVisibility() == View.VISIBLE;
             expandableLayout.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
             expandedStates.put(instructor.getInstructor_id(), !isExpanded);
+
+            parentLayout.post(() -> {
+                parentLayout.requestLayout();
+                parentLayout.invalidate();
+            });
         });
 
         // Add button and expandable layout to the card layout
@@ -244,57 +248,6 @@ public class InstructorsActivity extends AppCompatActivity {
 
         for (Instructor instructor : instructors) {
             createInstructorButton(instructor);
-        }
-    }
-
-    /**
-     * Adjusts the layout orientation when switching from portrait to landscape & vice-versa.
-     * @param orientation the orientation
-     */
-
-    private void adjustLayoutOrientation(int orientation) {
-        Log.d("InstructorsActivity", "Adjusting layout orientation: " + orientation);
-
-        LinearLayout instructorLayout = findViewById(R.id.instructor_list_layout);
-        if (instructorLayout == null) {
-            Log.e("InstructorsActivity", "instructorLayout is null!");
-            return;
-        }
-
-        ScrollView scrollView = findViewById(R.id.scroll_view);
-
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // Change the orientation to horizontal in landscape mode
-            instructorLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-            HorizontalScrollView horizontalScrollView = new HorizontalScrollView(this);
-            horizontalScrollView.setId(R.id.scroll_view);
-            horizontalScrollView.addView(instructorLayout);
-
-            // Get the parent constraint layout and replace the current ScrollView
-            ConstraintLayout parent = findViewById(R.id.constraint_layout);
-            if (parent != null) {
-                parent.removeView(scrollView);
-                parent.addView(horizontalScrollView);
-            }
-
-        } else {
-            // Change the orientation to vertical in portrait mode
-            instructorLayout.setOrientation(LinearLayout.VERTICAL);
-
-            // Ensure ScrollView is used for portrait mode
-            if (!(scrollView instanceof ScrollView)) {
-                ScrollView verticalScrollView = new ScrollView(this);
-                verticalScrollView.setId(R.id.scroll_view);
-                verticalScrollView.addView(instructorLayout);
-
-                // Get the parent constraint layout and replace the current ScrollView
-                ConstraintLayout parent = findViewById(R.id.constraint_layout);
-                if (parent != null) {
-                    parent.removeView(scrollView);
-                    parent.addView(verticalScrollView);
-                }
-            }
         }
     }
 
@@ -325,6 +278,5 @@ public class InstructorsActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        adjustLayoutOrientation(newConfig.orientation);
     }
 }

@@ -11,7 +11,8 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/new_instructor_button" >
 
         <LinearLayout
             android:id="@+id/instructor_list_layout"
