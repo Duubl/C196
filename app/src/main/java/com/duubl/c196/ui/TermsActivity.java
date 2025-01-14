@@ -19,11 +19,13 @@ import com.duubl.c196.entities.Term;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class TermsActivity extends AppCompatActivity {
 
-    private Button new_term_button;
-    private LinearLayout terms_layout;
+    private Button newTermButton;
+    private LinearLayout termLayout;
+    private List<Term> terms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +39,8 @@ public class TermsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        new_term_button = findViewById(R.id.new_term_button);
-        new_term_button.setOnClickListener(item -> {
+        newTermButton = findViewById(R.id.new_term_button);
+        newTermButton.setOnClickListener(item -> {
             openInputDialog();
         });
     }
@@ -121,7 +123,7 @@ public class TermsActivity extends AppCompatActivity {
 
     private void createTermButton(String termName) {
         // TODO: Create term buttons for each term already stored in the database
-        terms_layout = findViewById(R.id.term_list_layout);
+        termLayout = findViewById(R.id.term_list_layout);
         Button termButton = new Button(this);
         termButton.setText(termName);
         termButton.setLayoutParams(new LinearLayout.LayoutParams(
@@ -134,7 +136,7 @@ public class TermsActivity extends AppCompatActivity {
             Toast.makeText(this, "Clicked: " + termName, Toast.LENGTH_SHORT).show();
         });
 
-        terms_layout.addView(termButton);
+        termLayout.addView(termButton);
     }
 
     @Override
