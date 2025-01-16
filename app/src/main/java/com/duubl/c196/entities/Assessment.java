@@ -3,6 +3,7 @@ package com.duubl.c196.entities;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Entity(tableName = "assessments")
@@ -12,7 +13,9 @@ public class Assessment {
     // Foreign key
     private int course_id;
     private String assessment_name;
-    private int assessment_type;
+    private LocalDate start_date;
+    private LocalDate end_date;
+    private AssessmentType assessment_type;
 
     public int getAssessment_id() {
         return assessment_id;
@@ -26,7 +29,7 @@ public class Assessment {
         return assessment_name;
     }
 
-    public int getAssessment_type() {
+    public AssessmentType getAssessment_type() {
         return assessment_type;
     }
 
@@ -42,7 +45,23 @@ public class Assessment {
         this.assessment_name = assessment_name;
     }
 
-    public void setAssessment_type(int assessment_type) {
+    public void setAssessment_type(AssessmentType assessment_type) {
         this.assessment_type = assessment_type;
+    }
+
+    public LocalDate getStart_date() {
+        return start_date;
+    }
+
+    public void setStart_date(LocalDate start_date) {
+        this.start_date = start_date;
+    }
+
+    public LocalDate getEnd_date() {
+        return end_date;
+    }
+
+    public void setEnd_date(LocalDate end_date) {
+        this.end_date = end_date;
     }
 }
