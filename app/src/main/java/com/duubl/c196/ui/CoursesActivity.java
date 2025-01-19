@@ -21,10 +21,12 @@ import androidx.core.content.ContextCompat;
 
 import com.duubl.c196.R;
 import com.duubl.c196.database.Repository;
+import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Course;
 
+import java.sql.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,6 +93,7 @@ public class CoursesActivity extends AppCompatActivity {
         builder.setTitle("New Course");
 
         ArrayList<Instructor> assignedInstructors = new ArrayList<>();
+        ArrayList<Assessment> assignedAssessments = new ArrayList<>();
 
         LinearLayout inputLayout = new LinearLayout(this);
         inputLayout.setOrientation(LinearLayout.VERTICAL);
@@ -182,6 +185,33 @@ public class CoursesActivity extends AppCompatActivity {
                     .show();
         });
 
+        final Button newCourseAssessmentButton = new Button(this);
+        newCourseAssessmentButton.setText("Assign Assessment");
+        inputLayout.addView(newCourseAssessmentButton);
+        newCourseAssessmentButton.setOnClickListener(v -> {
+            List<Assessment> assessments;
+            try {
+                assessments = repository.getAllAssessments();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            String[] assessmentOptions = new String[assessments.size()];
+            for (int i = 0; i < assessments.size(); i++) {
+                assessmentOptions[i] = assessments.get(i).getName();
+            }
+
+            // TODO: Prevent duplicate assessments from being assigned to the same course
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Assign Assessments")
+                    .setItems(assessmentOptions, (dialog, which) -> {
+                        newCourseAssessmentButton.setText(assessmentOptions[which]);
+                        assignedAssessments.add(assessments.get(which));
+                    })
+                    .create()
+                    .show();
+        });
+
         // Creates the button on submit if all fields contain information.
         // TODO: Add error checking and proper formatting checking
         builder.setPositiveButton("Add", (dialog, which) -> {
@@ -192,7 +222,7 @@ public class CoursesActivity extends AppCompatActivity {
             }
 
             try {
-                createNewCourse(courseName, localStartDate[0], localEndDate[0], status[0], assignedInstructors);
+                createNewCourse(courseName, localStartDate[0], localEndDate[0], status[0]);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -214,11 +244,10 @@ public class CoursesActivity extends AppCompatActivity {
      * @param startDate the start date of the course
      * @param endDate the end date of the course
      * @param status the status of the course
-     * @param instructors the instructors assigned to the course
      * @throws InterruptedException
      */
 
-    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, ArrayList<Instructor> instructors) throws InterruptedException {
+    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status) throws InterruptedException {
         repository = new Repository(getApplication());
         Course course = new Course(0, 0, name, startDate, endDate, status);
         repository.insert(course);
@@ -286,7 +315,7 @@ public class CoursesActivity extends AppCompatActivity {
         expandableLayout.addView(endTextView);
 
         TextView assignedInstructorView = new TextView(this);
-        assignedInstructorView.setText("\nAssigned instructors: ");
+        assignedInstructorView.setText("\nAssigned Instructors: ");
         expandableLayout.addView(assignedInstructorView);
 
         List<Instructor> assignedInstructors = repository.getAllCourseInstructors(course);
@@ -301,6 +330,21 @@ public class CoursesActivity extends AppCompatActivity {
             }
         }
 
+        TextView assignedAssessmentsView = new TextView(this);
+        assignedAssessmentsView.setText("\nAssigned Assessments: ");
+        expandableLayout.addView(assignedAssessmentsView);
+
+        List<Assessment> assignedAssessments = repository.getAllCourseAssessments(course);
+        if (!assignedInstructors.isEmpty()) {
+            for (Assessment assessment : assignedAssessments) {
+                Button i = new Button(this);
+                i.setText(assessment.getName());
+                expandableLayout.addView(i);
+                i.setOnClickListener(v -> {
+                    startActivity(new Intent(getApplicationContext(), AssessmentsActivity.class));
+                });
+            }
+        }
 
         // Button click listener to toggle expandable layout
         instructorButton.setOnClickListener(v -> {

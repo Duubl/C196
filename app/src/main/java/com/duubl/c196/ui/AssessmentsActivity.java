@@ -1,6 +1,7 @@
 package com.duubl.c196.ui;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ import com.duubl.c196.R;
 import com.duubl.c196.database.Repository;
 import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.AssessmentType;
+import com.duubl.c196.entities.Course;
 import com.duubl.c196.entities.Instructor;
 
 import java.time.LocalDate;
@@ -74,7 +76,11 @@ public class AssessmentsActivity extends AppCompatActivity {
             Log.e("AssessmentsActivity", "there are no assessments!");
             throw new RuntimeException(e);
         }
-        populateAssessmentCards();
+        try {
+            populateAssessmentCards();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -164,7 +170,11 @@ public class AssessmentsActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
             Log.d("AssessmentsActivity", "Sent data to create new assessment " + assessmentName);
-            populateAssessmentCards();
+            try {
+                populateAssessmentCards();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
@@ -190,7 +200,7 @@ public class AssessmentsActivity extends AppCompatActivity {
      * @param assessment the assessment to have the button created for
      */
 
-    private void createAssessmentButton(Assessment assessment) {
+    private void createAssessmentButton(Assessment assessment) throws InterruptedException {
         LinearLayout parentLayout = findViewById(R.id.assessments_list_layout);
         parentLayout.setPadding(parentLayout.getPaddingLeft(),
                 parentLayout.getPaddingTop(),
@@ -245,7 +255,6 @@ public class AssessmentsActivity extends AppCompatActivity {
         endTextView.setText("End Date: " + assessment.getEndDate());
         expandableLayout.addView(endTextView);
 
-        // TODO: Add course assessment is assigned to
         TextView assignedCoursesView = new TextView(this);
         assignedCoursesView.setText("\nAssigned course: ");
         expandableLayout.addView(assignedCoursesView);
@@ -262,6 +271,22 @@ public class AssessmentsActivity extends AppCompatActivity {
             });
         });
 
+        List<Course> assignedCourses = repository.getAllAssessmentCourses(assessment);
+        if (!assignedCourses.isEmpty()) {
+            for (Course course : assignedCourses) {
+                Button c = new Button(this);
+                c.setText(course.getCourseName());
+                expandableLayout.addView(c);
+                c.setOnClickListener(v -> {
+                    startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
+                });
+            }
+        } else {
+            TextView noCourses = new TextView(this);
+            noCourses.setText("Not assigned to any courses!");
+            expandableLayout.addView(noCourses);
+        }
+
         // Add button and expandable layout to the card layout
         cardLayout.addView(instructorButton);
         cardLayout.addView(expandableLayout);
@@ -277,7 +302,7 @@ public class AssessmentsActivity extends AppCompatActivity {
      * Populates the instructor cards in the activity.
      */
 
-    private void populateAssessmentCards() {
+    private void populateAssessmentCards() throws InterruptedException {
         if (assessmentLayout != null) {
             assessmentLayout.removeAllViews();
         }

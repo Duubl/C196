@@ -17,6 +17,8 @@ public class Course {
     private int termID;
     // Foreign key
     private int instructorID;
+    // Foreign key
+    private int assessmentID;
     private String courseName;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -85,5 +87,13 @@ public class Course {
 
     public void setInstructorID(int instructorID) {
         this.instructorID = instructorID;
+    }
+
+    public int getAssessmentID() {
+        return assessmentID;
+    }
+
+    public void setAssessmentID(int assessmentID) {
+        this.assessmentID = assessmentID;
     }
 }

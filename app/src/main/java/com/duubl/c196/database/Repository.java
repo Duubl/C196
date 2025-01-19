@@ -144,6 +144,15 @@ public class Repository {
         return all_courses;
     }
 
+    public List<Course> getAllAssessmentCourses(Assessment assessment) throws InterruptedException {
+        database_executor.execute(() -> {
+            all_courses = assessment_dao.getAllAssessmentCourses(assessment.getAssessmentID());
+        });
+
+        Thread.sleep(1000);
+        return all_courses;
+    }
+
     /**
      * Pulls all the courses from the database
      * @return all_courses, a list of all the courses

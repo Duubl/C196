@@ -151,8 +151,10 @@ public class InstructorsActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void createNewInstructor(String name, String phone, String email) throws InterruptedException {
+    private void createNewInstructor( String name, String phone, String email) throws InterruptedException {
         repository = new Repository(getApplication());
+
+        // TODO: Change this so the IDS are set when created. Right now they default to 0.
         Instructor instructor = new Instructor(0, 0, name, phone, email);
         repository.insert(instructor);
         instructors.add(instructor);

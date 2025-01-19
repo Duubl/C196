@@ -8,6 +8,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.duubl.c196.entities.Assessment;
+import com.duubl.c196.entities.Course;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,4 +29,7 @@ public interface AssessmentDAO {
 
     @Query("SELECT * FROM assessments WHERE assessmentID=:course_id ORDER BY assessmentID ASC")
     List<Assessment> getCourseAssessments(int course_id);
+
+    @Query("SELECT * FROM courses WHERE assessmentID=:course_id ORDER BY courseID ASC")
+    List<Course> getAllAssessmentCourses(int course_id);
 }
