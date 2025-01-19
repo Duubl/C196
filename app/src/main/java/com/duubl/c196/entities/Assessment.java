@@ -9,59 +9,67 @@ import java.util.ArrayList;
 @Entity(tableName = "assessments")
 public class Assessment {
     @PrimaryKey(autoGenerate = true)
-    private int assessment_id;
+    private int assessmentID;
     // Foreign key
-    private int course_id;
-    private String assessment_name;
-    private LocalDate start_date;
-    private LocalDate end_date;
-    private AssessmentType assessment_type;
+    private int courseID;
+    private String name;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private AssessmentType type;
 
-    public int getAssessment_id() {
-        return assessment_id;
+    public Assessment(int assessmentID, String name, LocalDate startDate, LocalDate endDate, AssessmentType type) {
+        this.assessmentID = assessmentID;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.type = type;
     }
 
-    public int getCourse_id() {
-        return course_id;
+    public int getAssessmentID() {
+        return assessmentID;
     }
 
-    public String getAssessment_name() {
-        return assessment_name;
+    public void setAssessmentID(int assessmentID) {
+        this.assessmentID = assessmentID;
     }
 
-    public AssessmentType getAssessment_type() {
-        return assessment_type;
+    public int getCourseID() {
+        return courseID;
     }
 
-    public void setAssessment_id(int assessment_id) {
-        this.assessment_id = assessment_id;
+    public void setCourseID(int courseID) {
+        this.courseID = courseID;
     }
 
-    public void setCourse_id(int course_id) {
-        this.course_id = course_id;
+    public String getName() {
+        return name;
     }
 
-    public void setAssessment_name(String assessment_name) {
-        this.assessment_name = assessment_name;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setAssessment_type(AssessmentType assessment_type) {
-        this.assessment_type = assessment_type;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public LocalDate getStart_date() {
-        return start_date;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public void setStart_date(LocalDate start_date) {
-        this.start_date = start_date;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public LocalDate getEnd_date() {
-        return end_date;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
-    public void setEnd_date(LocalDate end_date) {
-        this.end_date = end_date;
+    public AssessmentType getType() {
+        return type;
+    }
+
+    public void setType(AssessmentType type) {
+        this.type = type;
     }
 }

@@ -19,7 +19,7 @@ import com.duubl.c196.entities.Term;
 import com.duubl.c196.util.Converter;
 
 // When making changes to the database, change the version number
-@Database(entities = {Term.class, Course.class, Instructor.class, Assessment.class}, version = 1, exportSchema = false)
+@Database(entities = {Term.class, Course.class, Instructor.class, Assessment.class}, version = 3, exportSchema = false)
 @TypeConverters({Converter.class})
 public abstract class DatabaseBuilder extends RoomDatabase {
     public abstract TermDAO term_dao();

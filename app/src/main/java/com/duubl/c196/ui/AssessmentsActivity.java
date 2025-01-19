@@ -25,6 +25,7 @@ import com.duubl.c196.entities.AssessmentType;
 import com.duubl.c196.entities.Instructor;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +65,16 @@ public class AssessmentsActivity extends AppCompatActivity {
         newAssessmentButton.setOnClickListener(item -> {
             openInputDialog();
         });
+
+        // Loads the instructors into the activity on creation
+        repository = new Repository(getApplication());
+        try {
+            assessments = repository.getAllAssessments();
+        } catch (InterruptedException e) {
+            Log.e("AssessmentsActivity", "there are no assessments!");
+            throw new RuntimeException(e);
+        }
+        populateAssessmentCards();
     }
 
     /**
@@ -93,14 +104,16 @@ public class AssessmentsActivity extends AppCompatActivity {
         startDateButton.setText("Select the start date of the assessment");
         inputLayout.addView(startDateButton);
 
-        final Calendar[] startDate = new Calendar[1];
+        final LocalDate[] localStartDate = new LocalDate[1];
         startDateButton.setOnClickListener(v -> {
-            Calendar calendar = Calendar.getInstance();
-            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-                calendar.set(year, month, dayOfMonth);
-                startDate[0] = calendar;
-                startDateButton.setText(String.format("%d/%d/%d", month + 1, dayOfMonth, year));
-            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localStartDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                startDateButton.setText(localStartDate[0].toString());
+            }, year, month, day).show();
         });
 
         // Get the end date of the assessment
@@ -112,19 +125,38 @@ public class AssessmentsActivity extends AppCompatActivity {
         endDateButton.setText("Select the date of the assessment");
         inputLayout.addView(endDateButton);
 
-        final Calendar[] endDate = new Calendar[1];
+        final LocalDate[] localEndDate = new LocalDate[1];
         endDateButton.setOnClickListener(v -> {
-            Calendar calendar = Calendar.getInstance();
-            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-                calendar.set(year, month, dayOfMonth);
-                endDate[0] = calendar;
-                endDateButton.setText(String.format("%d/%d/%d", month + 1, dayOfMonth, year));
-            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localEndDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                endDateButton.setText(localEndDate[0].toString());
+            }, year, month, day).show();
         });
 
-        // TODO: Add conversion from calendar[] to LocalDate
+        final Button assessmentTypeButton = new Button(this);
+        assessmentTypeButton.setText("Select the assessment type");
+        final AssessmentType[] type = new AssessmentType[1];
+        inputLayout.addView(assessmentTypeButton);
+        assessmentTypeButton.setOnClickListener(v -> {
+            AssessmentType[] assessmentTypes = AssessmentType.values();
+            String[] options = new String[assessmentTypes.length];
+            for (int i = 0; i < assessmentTypes.length; i++) {
+                options[i] = assessmentTypes[i].name();
+            }
 
-        // TODO: Add ability to select the type of assessment
+            new AlertDialog.Builder(this)
+                    .setTitle("Select Assessment Type")
+                    .setItems(options, (dialog, which) -> {
+                        assessmentTypeButton.setText(options[which]);
+                        type[0] = assessmentTypes[which];
+                    })
+                    .create()
+                    .show();
+        });
 
         // TODO: Add ability to add instructor to a course
 
@@ -134,13 +166,13 @@ public class AssessmentsActivity extends AppCompatActivity {
         // TODO: Add error checking and proper formatting checking
         builder.setPositiveButton("Add", (dialog, which) -> {
             String assessmentName = nameInput.getText().toString().trim();
-            if (assessmentName.isEmpty() || startDate[0] == null) {
+            if (assessmentName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             try {
-                createNewAssessment(assessmentName, startDate, endDate);
+                createNewAssessment(assessmentName, localStartDate[0], localEndDate[0], type[0]);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -159,8 +191,11 @@ public class AssessmentsActivity extends AppCompatActivity {
      * @param endDate the end date of the assessment
      */
 
-    private void createNewAssessment(String name, LocalDate startDate, LocalDate endDate) {
-        // TODO: Create assessments. Also add type as an input
+    private void createNewAssessment(String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException {
+        repository = new Repository(getApplication());
+        Assessment assessment = new Assessment(0, name, startDate, endDate, type);
+        repository.insert(assessment);
+        assessments.add(assessment);
     }
 
     /**
@@ -196,7 +231,7 @@ public class AssessmentsActivity extends AppCompatActivity {
 
         // Create button
         Button instructorButton = new Button(this);
-        instructorButton.setText(assessment.getAssessment_name());
+        instructorButton.setText(assessment.getName());
         instructorButton.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -207,7 +242,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
         expandableLayout.setOrientation(LinearLayout.VERTICAL);
-        expandableLayout.setVisibility(expandedStates.getOrDefault(assessment.getAssessment_id(), false) ? View.VISIBLE : View.GONE);
+        expandableLayout.setVisibility(expandedStates.getOrDefault(assessment.getAssessmentID(), false) ? View.VISIBLE : View.GONE);
         expandableLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -216,11 +251,11 @@ public class AssessmentsActivity extends AppCompatActivity {
 
         // Add details to the expandable section
         TextView startTextView = new TextView(this);
-        startTextView.setText("Start Date: " + assessment.getStart_date());
+        startTextView.setText("Start Date: " + assessment.getStartDate());
         expandableLayout.addView(startTextView);
 
         TextView endTextView = new TextView(this);
-        endTextView.setText("End Date: " + assessment.getEnd_date());
+        endTextView.setText("End Date: " + assessment.getEndDate());
         expandableLayout.addView(endTextView);
 
         // TODO: Add course assessment is assigned to
@@ -232,7 +267,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         instructorButton.setOnClickListener(v -> {
             boolean isExpanded = expandableLayout.getVisibility() == View.VISIBLE;
             expandableLayout.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
-            expandedStates.put(assessment.getAssessment_id(), !isExpanded);
+            expandedStates.put(assessment.getAssessmentID(), !isExpanded);
 
             parentLayout.post(() -> {
                 parentLayout.requestLayout();
