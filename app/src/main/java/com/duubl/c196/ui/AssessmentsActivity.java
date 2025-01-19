@@ -92,16 +92,11 @@ public class AssessmentsActivity extends AppCompatActivity {
 
         // Get the instructor name
         final EditText nameInput = new EditText(this);
-        nameInput.setHint("Enter the name for the assessment");
+        nameInput.setHint("Assessment Name");
         inputLayout.addView(nameInput);
 
-        // Get the start date of the assessment
-        final TextView startDateText = new TextView(this);
-        startDateText.setText("Assessment start date");
-        inputLayout.addView(startDateText);
-
         final Button startDateButton = new Button(this);
-        startDateButton.setText("Select the start date of the assessment");
+        startDateButton.setText("Assessment Start Date");
         inputLayout.addView(startDateButton);
 
         final LocalDate[] localStartDate = new LocalDate[1];
@@ -116,13 +111,8 @@ public class AssessmentsActivity extends AppCompatActivity {
             }, year, month, day).show();
         });
 
-        // Get the end date of the assessment
-        final TextView endDateText = new TextView(this);
-        endDateText.setText("Assessment end date");
-        inputLayout.addView(endDateText);
-
         final Button endDateButton = new Button(this);
-        endDateButton.setText("Select the date of the assessment");
+        endDateButton.setText("Assessment End Date");
         inputLayout.addView(endDateButton);
 
         final LocalDate[] localEndDate = new LocalDate[1];
@@ -138,7 +128,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         });
 
         final Button assessmentTypeButton = new Button(this);
-        assessmentTypeButton.setText("Select the assessment type");
+        assessmentTypeButton.setText("Assessment Type");
         final AssessmentType[] type = new AssessmentType[1];
         inputLayout.addView(assessmentTypeButton);
         assessmentTypeButton.setOnClickListener(v -> {

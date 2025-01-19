@@ -92,17 +92,17 @@ public class InstructorsActivity extends AppCompatActivity {
 
         // Get the instructor name
         final EditText nameInput = new EditText(this);
-        nameInput.setHint("Enter instructor name");
+        nameInput.setHint("Instructor Name");
         inputLayout.addView(nameInput);
 
         // Get instructor phone number
         final EditText phoneInput = new EditText(this);
-        phoneInput.setHint("Enter instructor's phone number");
+        phoneInput.setHint("Instructor's Phone Number");
         inputLayout.addView(phoneInput);
 
         // Get instructor email address
         final EditText emailInput = new EditText(this);
-        emailInput.setHint("Enter instructor's email address");
+        emailInput.setHint("Instructor's Email Address");
         inputLayout.addView(emailInput);
 
         // TODO: Add ability to add instructor to a course
