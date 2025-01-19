@@ -1,5 +1,6 @@
 package com.duubl.c196.ui;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import com.duubl.c196.R;
 import com.duubl.c196.database.Repository;
+import com.duubl.c196.entities.Course;
 import com.duubl.c196.entities.Instructor;
 
 import java.util.ArrayList;
@@ -74,7 +76,11 @@ public class InstructorsActivity extends AppCompatActivity {
             Log.e("InstructorsActivity", "there are no instructors!");
             throw new RuntimeException(e);
         }
-        populateInstructorCards();
+        try {
+            populateInstructorCards();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -126,7 +132,11 @@ public class InstructorsActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
             Log.d("InstructorsActivity", "Sent data to create new instructor " + instructorName);
-            populateInstructorCards();
+            try {
+                populateInstructorCards();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
@@ -153,7 +163,7 @@ public class InstructorsActivity extends AppCompatActivity {
      * @param instructor the instructor to have the button created for
      */
 
-    private void createInstructorButton(Instructor instructor) {
+    private void createInstructorButton(Instructor instructor) throws InterruptedException {
         LinearLayout parentLayout = findViewById(R.id.instructor_list_layout);
         parentLayout.setPadding(parentLayout.getPaddingLeft(),
                 parentLayout.getPaddingTop(),
@@ -208,7 +218,6 @@ public class InstructorsActivity extends AppCompatActivity {
         phoneTextView.setText("Phone: " + instructor.getInstructor_phone());
         expandableLayout.addView(phoneTextView);
 
-        // TODO: Add assigned courses to instructors
         // Should show a list of courses
         TextView assignedCoursesView = new TextView(this);
         assignedCoursesView.setText("\nAssigned courses: ");
@@ -226,6 +235,18 @@ public class InstructorsActivity extends AppCompatActivity {
             });
         });
 
+        List<Course> assignedCourses = repository.getAllInstructorCourses(instructor);
+        if (!assignedCourses.isEmpty()) {
+            for (Course course : assignedCourses) {
+                Button c = new Button(this);
+                c.setText(course.getCourseName());
+                expandableLayout.addView(c);
+                c.setOnClickListener(v -> {
+                    startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
+                });
+            }
+        }
+
         // Add button and expandable layout to the card layout
         cardLayout.addView(instructorButton);
         cardLayout.addView(expandableLayout);
@@ -241,7 +262,7 @@ public class InstructorsActivity extends AppCompatActivity {
      * Populates the instructor cards in the activity.
      */
 
-    private void populateInstructorCards() {
+    private void populateInstructorCards() throws InterruptedException {
         if (instructorLayout != null) {
             instructorLayout.removeAllViews();
         }
@@ -272,7 +293,11 @@ public class InstructorsActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             expandedStates = (HashMap<Integer, Boolean>) savedInstanceState.getSerializable("expandedStates");
         }
-        populateInstructorCards();
+        try {
+            populateInstructorCards();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

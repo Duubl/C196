@@ -135,6 +135,15 @@ public class Repository {
         return all_courses;
     }
 
+    public List<Course> getAllInstructorCourses(Instructor instructor) throws InterruptedException {
+        database_executor.execute(() -> {
+            all_courses = instructor_dao.getAllInstructorCourses(instructor.getCourse_id());
+        });
+
+        Thread.sleep(1000);
+        return all_courses;
+    }
+
     /**
      * Pulls all the courses from the database
      * @return all_courses, a list of all the courses

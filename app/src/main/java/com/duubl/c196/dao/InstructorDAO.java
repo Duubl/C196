@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.duubl.c196.entities.Course;
 import com.duubl.c196.entities.Instructor;
 
 import java.util.ArrayList;
@@ -28,4 +29,7 @@ public interface InstructorDAO {
 
     @Query("SELECT * FROM instructors WHERE instructor_id=:course_id ORDER BY instructor_id ASC")
     List<Instructor> getCourseInstructors(int course_id);
+
+    @Query("SELECT * FROM courses WHERE instructorID=:instructor_id ORDER BY courseID ASC")
+    List<Course> getAllInstructorCourses(int instructor_id);
 }
