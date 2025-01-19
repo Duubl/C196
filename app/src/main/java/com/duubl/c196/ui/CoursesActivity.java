@@ -1,6 +1,7 @@
 package com.duubl.c196.ui;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -291,9 +292,12 @@ public class CoursesActivity extends AppCompatActivity {
         List<Instructor> assignedInstructors = repository.getAllCourseInstructors(course);
         if (!assignedInstructors.isEmpty()) {
             for (Instructor instructor : assignedInstructors) {
-                TextView i = new TextView(this);
+                Button i = new Button(this);
                 i.setText(instructor.getInstructor_name());
                 expandableLayout.addView(i);
+                i.setOnClickListener(v -> {
+                    startActivity(new Intent(getApplicationContext(), InstructorsActivity.class));
+                });
             }
         }
 
