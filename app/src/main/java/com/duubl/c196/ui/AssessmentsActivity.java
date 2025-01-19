@@ -147,9 +147,6 @@ public class AssessmentsActivity extends AppCompatActivity {
                     .create()
                     .show();
         });
-
-        // TODO: Add ability to add instructor to a course
-
         builder.setView(inputLayout);
 
         // Creates the button on submit if all fields contain information.

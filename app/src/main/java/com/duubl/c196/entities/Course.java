@@ -12,58 +12,68 @@ import java.util.ArrayList;
 public class Course {
 
     @PrimaryKey(autoGenerate = true)
-    private int course_id;
+    private int courseID;
     // Foreign key
-    private int term_id;
-    private String course_name;
-    private LocalDate start_date;
-    private LocalDate end_date;
+    private int termID;
+    private String courseName;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Status status;
 
-    public Course(int course_id, int term_id, String course_name, LocalDate start_date, LocalDate end_date, Status status) {
-       this.course_id = course_id;
-       this.term_id = term_id;
-       this.course_name = course_name;
-       this.start_date = start_date;
-       this.end_date = end_date;
-       this.status = status;
+    public Course(int courseID, int termID, String courseName, LocalDate startDate, LocalDate endDate, Status status) {
+        this.courseID = courseID;
+        this.termID = termID;
+        this.courseName = courseName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
     }
 
-    /**
-     * Gets the course name
-     * @return the course name
-     */
+    public int getCourseID() {
+        return courseID;
+    }
+
+    public void setCourseID(int courseID) {
+        this.courseID = courseID;
+    }
+
+    public int getTermID() {
+        return termID;
+    }
+
+    public void setTermID(int termID) {
+        this.termID = termID;
+    }
 
     public String getCourseName() {
-        return this.course_name;
+        return courseName;
     }
 
-    /**
-     * Gets the course ID
-     * @return the course ID
-     */
-
-    public int getCourse_id() {
-        return this.course_id;
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 
-    public int getTerm_id() {
-        return this.term_id;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public String getCourse_name() {
-        return this.course_name;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public LocalDate getStart_date() {
-        return start_date;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public LocalDate getEnd_date() {
-        return end_date;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public Status getStatus() {
         return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

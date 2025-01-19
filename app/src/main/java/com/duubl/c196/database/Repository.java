@@ -200,7 +200,7 @@ public class Repository {
 
     public List<Instructor> getAllCourseInstructors(Course course) throws InterruptedException {
         database_executor.execute(()-> {
-            all_instructors = course_dao.getCourseInstructors(course.getCourse_id());
+            all_instructors = course_dao.getCourseInstructors(course.getCourseID());
         });
 
         Thread.sleep(1000);
@@ -287,7 +287,7 @@ public class Repository {
 
     public List<Assessment> getAllCourseAssessments(Course course) throws InterruptedException {
         database_executor.execute(()-> {
-            all_assessments = course_dao.getCourseAssessments(course.getCourse_id());
+            all_assessments = course_dao.getCourseAssessments(course.getCourseID());
         });
 
         Thread.sleep(1000);

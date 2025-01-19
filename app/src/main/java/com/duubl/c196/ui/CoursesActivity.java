@@ -1,20 +1,48 @@
 package com.duubl.c196.ui;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.duubl.c196.R;
+import com.duubl.c196.database.Repository;
+import com.duubl.c196.entities.Instructor;
+import com.duubl.c196.entities.Status;
+import com.duubl.c196.entities.Course;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class CoursesActivity extends AppCompatActivity {
+
+    private Button newCourseButton;
+    private LinearLayout courseLayout;
+    private Repository repository;
+    private List<Course> courses;
+
+    // HashMap to store the expanded states of the cards. Helpful for changing orientation of the phone.
+    private HashMap<Integer, Boolean> expandedStates = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_terms);
+        setContentView(R.layout.activity_courses);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -22,6 +50,289 @@ public class CoursesActivity extends AppCompatActivity {
         // Enable the back button
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        // Layout for the list of courses.
+        courseLayout = findViewById(R.id.courses_list_layout);
+        if (courseLayout == null) {
+            Log.e("coursesActivity", "courseLayout is null!");
+            return;
+        }
+
+        // New course button
+        newCourseButton = findViewById(R.id.new_course_button);
+        newCourseButton.setOnClickListener(item -> {
+            openInputDialog();
+        });
+
+        // Loads the courses into the activity on creation
+        repository = new Repository(getApplication());
+        try {
+            courses = repository.getAllCourses();
+        } catch (InterruptedException e) {
+            Log.e("coursesActivity", "there are no courses!");
+            throw new RuntimeException(e);
+        }
+        try {
+            populateCourseCards();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Opens the input dialog for adding a new course.
+     * Takes input from the user for the name, start & end dates, status and all course instructor information.
+     */
+
+    private void openInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("New Course");
+
+        ArrayList<Instructor> assignedInstructors = new ArrayList<Instructor>();
+
+        LinearLayout inputLayout = new LinearLayout(this);
+        inputLayout.setOrientation(LinearLayout.VERTICAL);
+        inputLayout.setPadding(16, 16, 16, 16);
+
+        // Get the course name
+        final EditText nameInput = new EditText(this);
+        nameInput.setHint("Course Name");
+        inputLayout.addView(nameInput);
+        builder.setView(inputLayout);
+
+        final Button startDateButton = new Button(this);
+        startDateButton.setText("Course Start Date");
+        inputLayout.addView(startDateButton);
+
+        final LocalDate[] localStartDate = new LocalDate[1];
+        startDateButton.setOnClickListener(v -> {
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localStartDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                startDateButton.setText(localStartDate[0].toString());
+            }, year, month, day).show();
+        });
+
+        final Button endDateButton = new Button(this);
+        endDateButton.setText("Course End Date");
+        inputLayout.addView(endDateButton);
+
+        final LocalDate[] localEndDate = new LocalDate[1];
+        endDateButton.setOnClickListener(v -> {
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localEndDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                endDateButton.setText(localEndDate[0].toString());
+            }, year, month, day).show();
+        });
+
+        final Button courseStatusButton = new Button(this);
+        courseStatusButton.setText("Course Status");
+        final Status[] status = new Status[1];
+        inputLayout.addView(courseStatusButton);
+        courseStatusButton.setOnClickListener(v -> {
+            Status[] statuses = Status.values();
+            String[] options = new String[statuses.length];
+            for (int i = 0; i < statuses.length; i++) {
+                options[i] = statuses[i].name();
+            }
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Select Course Status")
+                    .setItems(options, (dialog, which) -> {
+                        courseStatusButton.setText(options[which]);
+                        status[0] = statuses[which];
+                    })
+                    .create()
+                    .show();
+        });
+
+        final Button newCourseInstructorButton = new Button(this);
+        newCourseInstructorButton.setText("Assign Instructor");
+        final Instructor[] instructor = new Instructor[1];
+        inputLayout.addView(newCourseInstructorButton);
+        newCourseInstructorButton.setOnClickListener(v -> {
+            List<Instructor> instructors;
+            try {
+                instructors = repository.getAllInstructors();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            String[] options = new String[instructors.size()];
+            for (int i = 0; i < instructors.size(); i++) {
+                options[i] = instructors.get(i).getInstructor_name();
+            }
+
+            // TODO: Prevent duplicate instructors from being assigned to the same course
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Assign Instructor")
+                    .setItems(options, (dialog, which) -> {
+                        courseStatusButton.setText(options[which]);
+                        assignedInstructors.add(instructors.get(which));
+                    })
+                    .create()
+                    .show();
+        });
+
+        // Creates the button on submit if all fields contain information.
+        // TODO: Add error checking and proper formatting checking
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String courseName = nameInput.getText().toString().trim();
+            if (courseName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null || status[0] == null || assignedInstructors.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                createNewCourse(courseName, localStartDate[0], localEndDate[0], status[0], assignedInstructors);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            Log.d("coursesActivity", "Sent data to create new course " + courseName);
+            try {
+                populateCourseCards();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    /**
+     * Creates a new course
+     * @param name the name of the course
+     * @param startDate the start date of the course
+     * @param endDate the end date of the course
+     * @param status the status of the course
+     * @param instructors the instructors assigned to the course
+     * @throws InterruptedException
+     */
+
+    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, ArrayList<Instructor> instructors) throws InterruptedException {
+        repository = new Repository(getApplication());
+        Course course = new Course(0, 0, name, startDate, endDate, status);
+        repository.insert(course);
+        courses.add(course);
+    }
+
+    /**
+     * Creates a button for the course
+     * @param course the course to have the button created for
+     */
+
+    private void createCourseButton(Course course) throws InterruptedException {
+        LinearLayout parentLayout = findViewById(R.id.courses_list_layout);
+        parentLayout.setPadding(parentLayout.getPaddingLeft(),
+                parentLayout.getPaddingTop(),
+                parentLayout.getPaddingRight(),
+                (courses.size()*36));
+
+        CardView cardView = new CardView(this);
+        cardView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        cardView.setCardElevation(8);
+        cardView.setRadius(16);
+        cardView.setPadding(16, 16, 16, 16);
+        cardView.setUseCompatPadding(true);
+
+        // Create parent LinearLayout inside the CardView
+        LinearLayout cardLayout = new LinearLayout(this);
+        cardLayout.setOrientation(LinearLayout.VERTICAL);
+        cardLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        // Create button
+        Button instructorButton = new Button(this);
+        instructorButton.setText(course.getCourseName());
+        instructorButton.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        instructorButton.setBackgroundColor(ContextCompat.getColor(this, R.color.tertiary));
+        instructorButton.setTextColor(ContextCompat.getColor(this, R.color.primary_variant));
+
+        // Create expandable section layout
+        LinearLayout expandableLayout = new LinearLayout(this);
+        expandableLayout.setOrientation(LinearLayout.VERTICAL);
+        expandableLayout.setVisibility(expandedStates.getOrDefault(course.getCourseID(), false) ? View.VISIBLE : View.GONE);
+        expandableLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        expandableLayout.setPadding(16, 16, 16, 16);
+
+        // Add details to the expandable section
+        TextView startTextView = new TextView(this);
+        startTextView.setText("Start Date: " + course.getStartDate());
+        expandableLayout.addView(startTextView);
+
+        TextView endTextView = new TextView(this);
+        endTextView.setText("End Date: " + course.getEndDate());
+        expandableLayout.addView(endTextView);
+
+        TextView assignedInstructorView = new TextView(this);
+        assignedInstructorView.setText("\nAssigned instructors: ");
+        expandableLayout.addView(assignedInstructorView);
+
+        List<Instructor> assignedInstructors = repository.getAllCourseInstructors(course);
+        if (!assignedInstructors.isEmpty()) {
+            for (Instructor instructor : assignedInstructors) {
+                TextView i = new TextView(this);
+                i.setText(instructor.getInstructor_name());
+                expandableLayout.addView(i);
+            }
+        }
+
+
+        // Button click listener to toggle expandable layout
+        instructorButton.setOnClickListener(v -> {
+            boolean isExpanded = expandableLayout.getVisibility() == View.VISIBLE;
+            expandableLayout.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
+            expandedStates.put(course.getCourseID(), !isExpanded);
+
+            parentLayout.post(() -> {
+                parentLayout.requestLayout();
+                parentLayout.invalidate();
+            });
+        });
+
+        // Add button and expandable layout to the card layout
+        cardLayout.addView(instructorButton);
+        cardLayout.addView(expandableLayout);
+
+        // Add card layout to the card view
+        cardView.addView(cardLayout);
+
+        // Add the card view to the parent layout
+        parentLayout.addView(cardView);
+    }
+
+    /**
+     * Popuates the course cards in the activity
+     */
+
+    private void populateCourseCards() throws InterruptedException {
+        if (courseLayout != null) {
+            courseLayout.removeAllViews();
+        }
+
+        for (Course course : courses) {
+            createCourseButton(course);
         }
     }
 
