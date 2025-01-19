@@ -89,7 +89,7 @@ public class CoursesActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New Course");
 
-        ArrayList<Instructor> assignedInstructors = new ArrayList<Instructor>();
+        ArrayList<Instructor> assignedInstructors = new ArrayList<>();
 
         LinearLayout inputLayout = new LinearLayout(this);
         inputLayout.setOrientation(LinearLayout.VERTICAL);
@@ -139,15 +139,15 @@ public class CoursesActivity extends AppCompatActivity {
         inputLayout.addView(courseStatusButton);
         courseStatusButton.setOnClickListener(v -> {
             Status[] statuses = Status.values();
-            String[] options = new String[statuses.length];
+            String[] courseOptions = new String[statuses.length];
             for (int i = 0; i < statuses.length; i++) {
-                options[i] = statuses[i].name();
+                courseOptions[i] = statuses[i].name();
             }
 
             new AlertDialog.Builder(this)
                     .setTitle("Select Course Status")
-                    .setItems(options, (dialog, which) -> {
-                        courseStatusButton.setText(options[which]);
+                    .setItems(courseOptions, (dialog, which) -> {
+                        courseStatusButton.setText(courseOptions[which]);
                         status[0] = statuses[which];
                     })
                     .create()
@@ -156,7 +156,6 @@ public class CoursesActivity extends AppCompatActivity {
 
         final Button newCourseInstructorButton = new Button(this);
         newCourseInstructorButton.setText("Assign Instructor");
-        final Instructor[] instructor = new Instructor[1];
         inputLayout.addView(newCourseInstructorButton);
         newCourseInstructorButton.setOnClickListener(v -> {
             List<Instructor> instructors;
@@ -165,17 +164,17 @@ public class CoursesActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            String[] options = new String[instructors.size()];
+            String[] instructorOptions = new String[instructors.size()];
             for (int i = 0; i < instructors.size(); i++) {
-                options[i] = instructors.get(i).getInstructor_name();
+                instructorOptions[i] = instructors.get(i).getInstructor_name();
             }
 
             // TODO: Prevent duplicate instructors from being assigned to the same course
 
             new AlertDialog.Builder(this)
                     .setTitle("Assign Instructor")
-                    .setItems(options, (dialog, which) -> {
-                        courseStatusButton.setText(options[which]);
+                    .setItems(instructorOptions, (dialog, which) -> {
+                        newCourseInstructorButton.setText(instructorOptions[which]);
                         assignedInstructors.add(instructors.get(which));
                     })
                     .create()
