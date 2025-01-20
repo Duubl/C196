@@ -193,7 +193,7 @@ public class InstructorsActivity extends AppCompatActivity {
 
         // Create button
         Button instructorButton = new Button(this);
-        instructorButton.setText(instructor.getInstructor_name());
+        instructorButton.setText(instructor.getInstructorName());
         instructorButton.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -204,7 +204,7 @@ public class InstructorsActivity extends AppCompatActivity {
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
         expandableLayout.setOrientation(LinearLayout.VERTICAL);
-        expandableLayout.setVisibility(expandedStates.getOrDefault(instructor.getInstructor_id(), false) ? View.VISIBLE : View.GONE);
+        expandableLayout.setVisibility(expandedStates.getOrDefault(instructor.getInstructorID(), false) ? View.VISIBLE : View.GONE);
         expandableLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -213,11 +213,11 @@ public class InstructorsActivity extends AppCompatActivity {
 
         // Add details to the expandable section
         TextView emailTextView = new TextView(this);
-        emailTextView.setText("Email: " + instructor.getInstructor_email());
+        emailTextView.setText("Email: " + instructor.getInstructorEmail());
         expandableLayout.addView(emailTextView);
 
         TextView phoneTextView = new TextView(this);
-        phoneTextView.setText("Phone: " + instructor.getInstructor_phone());
+        phoneTextView.setText("Phone: " + instructor.getInstructorPhone());
         expandableLayout.addView(phoneTextView);
 
         // Should show a list of courses
@@ -229,7 +229,7 @@ public class InstructorsActivity extends AppCompatActivity {
         instructorButton.setOnClickListener(v -> {
             boolean isExpanded = expandableLayout.getVisibility() == View.VISIBLE;
             expandableLayout.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
-            expandedStates.put(instructor.getInstructor_id(), !isExpanded);
+            expandedStates.put(instructor.getInstructorID(), !isExpanded);
 
             parentLayout.post(() -> {
                 parentLayout.requestLayout();
@@ -247,6 +247,10 @@ public class InstructorsActivity extends AppCompatActivity {
                     startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
                 });
             }
+        } else {
+            TextView noCourses = new TextView(this);
+            noCourses.setText("Not assigned to any courses!");
+            expandableLayout.addView(noCourses);
         }
 
         // Add button and expandable layout to the card layout

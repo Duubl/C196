@@ -24,10 +24,10 @@ public interface InstructorDAO {
     @Delete
     void delete(Instructor instructor);
 
-    @Query("SELECT * FROM instructors ORDER BY instructor_id ASC")
+    @Query("SELECT * FROM instructors ORDER BY instructorID ASC")
     List<Instructor> getAllInstructors();
 
-    @Query("SELECT * FROM instructors WHERE instructor_id=:course_id ORDER BY instructor_id ASC")
+    @Query("SELECT * FROM instructors WHERE instructorID=:course_id ORDER BY instructorID ASC")
     List<Instructor> getCourseInstructors(int course_id);
 
     @Query("SELECT * FROM courses WHERE instructorID=:instructor_id ORDER BY courseID ASC")

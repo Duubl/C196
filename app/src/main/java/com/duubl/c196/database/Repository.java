@@ -138,7 +138,7 @@ public class Repository {
 
     public List<Course> getAllInstructorCourses(Instructor instructor) throws InterruptedException {
         database_executor.execute(() -> {
-            all_courses = instructor_dao.getAllInstructorCourses(instructor.getCourse_id());
+            all_courses = instructor_dao.getAllInstructorCourses(instructor.getCourseID());
         });
 
         Thread.sleep(1000);
@@ -154,7 +154,6 @@ public class Repository {
                 Log.e("Repository", "Pulled no assessments for " + assessment.getName());
             }
         });
-        Thread.sleep(1000);
         return all_courses;
     }
 

@@ -170,7 +170,7 @@ public class CoursesActivity extends AppCompatActivity {
             }
             String[] instructorOptions = new String[instructors.size()];
             for (int i = 0; i < instructors.size(); i++) {
-                instructorOptions[i] = instructors.get(i).getInstructor_name();
+                instructorOptions[i] = instructors.get(i).getInstructorName();
             }
 
             // TODO: Prevent duplicate instructors from being assigned to the same course
@@ -216,13 +216,13 @@ public class CoursesActivity extends AppCompatActivity {
         // TODO: Add error checking and proper formatting checking
         builder.setPositiveButton("Add", (dialog, which) -> {
             String courseName = nameInput.getText().toString().trim();
-            if (courseName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null || status[0] == null || assignedInstructors.isEmpty()) {
+            if (courseName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null || status[0] == null || assignedInstructors.isEmpty() || assignedAssessments.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             try {
-                createNewCourse(courseName, localStartDate[0], localEndDate[0], status[0]);
+                createNewCourse(courseName, localStartDate[0], localEndDate[0], status[0], assignedInstructors, assignedAssessments);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -247,9 +247,15 @@ public class CoursesActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status) throws InterruptedException {
+    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, List<Instructor> instructors, List<Assessment> assessments) throws InterruptedException {
         repository = new Repository(getApplication());
         Course course = new Course(0, 0, name, startDate, endDate, status);
+        for (Instructor instructor : instructors) {
+            instructor.setCourseID(course.getCourseID());
+        }
+        for (Assessment assessment : assessments) {
+            assessment.setCourseID(course.getCourseID());
+        }
         repository.insert(course);
         courses.add(course);
     }
@@ -322,7 +328,7 @@ public class CoursesActivity extends AppCompatActivity {
         if (!assignedInstructors.isEmpty()) {
             for (Instructor instructor : assignedInstructors) {
                 Button i = new Button(this);
-                i.setText(instructor.getInstructor_name());
+                i.setText(instructor.getInstructorName());
                 expandableLayout.addView(i);
                 i.setOnClickListener(v -> {
                     startActivity(new Intent(getApplicationContext(), InstructorsActivity.class));

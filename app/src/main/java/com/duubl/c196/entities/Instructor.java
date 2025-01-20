@@ -6,58 +6,58 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "instructors")
 public class Instructor {
     @PrimaryKey(autoGenerate = true)
-    private int instructor_id;
+    private int instructorID;
     // Foreign key
-    private int course_id;
-    private String instructor_name;
-    private String instructor_phone;
-    private String instructor_email;
+    private int courseID;
+    private String instructorName;
+    private String instructorPhone;
+    private String instructorEmail;
 
-    public Instructor(int instructor_id, int course_id, String instructor_name, String instructor_phone, String instructor_email) {
-        this.instructor_id = instructor_id;
-        this.course_id = course_id;
-        this.instructor_name = instructor_name;
-        this.instructor_phone = instructor_phone;
-        this.instructor_email = instructor_email;
+    public Instructor(int instructorID, int courseID, String instructorName, String instructorPhone, String instructorEmail) {
+        this.instructorID = instructorID;
+        this.courseID = courseID;
+        this.instructorName = instructorName;
+        this.instructorPhone = instructorPhone;
+        this.instructorEmail = instructorEmail;
     }
 
-    public int getInstructor_id() {
-        return instructor_id;
+    public int getInstructorID() {
+        return instructorID;
     }
 
-    public int getCourse_id() {
-        return course_id;
+    public void setInstructorID(int instructorID) {
+        this.instructorID = instructorID;
     }
 
-    public String getInstructor_name() {
-        return instructor_name;
+    public int getCourseID() {
+        return courseID;
     }
 
-    public String getInstructor_phone() {
-        return instructor_phone;
+    public void setCourseID(int courseID) {
+        this.courseID = courseID;
     }
 
-    public String getInstructor_email() {
-        return instructor_email;
+    public String getInstructorName() {
+        return instructorName;
     }
 
-    public void setInstructor_id(int instructor_id) {
-        this.instructor_id = instructor_id;
+    public void setInstructorName(String instructorName) {
+        this.instructorName = instructorName;
     }
 
-    public void setCourse_id(int course_id) {
-        this.course_id = course_id;
+    public String getInstructorPhone() {
+        return instructorPhone;
     }
 
-    public void setInstructor_name(String instructor_name) {
-        this.instructor_name = instructor_name;
+    public void setInstructorPhone(String instructorPhone) {
+        this.instructorPhone = instructorPhone;
     }
 
-    public void setInstructor_phone(String instructor_phone) {
-        this.instructor_phone = instructor_phone;
+    public String getInstructorEmail() {
+        return instructorEmail;
     }
 
-    public void setInstructor_email(String instructor_email) {
-        this.instructor_email = instructor_email;
+    public void setInstructorEmail(String instructorEmail) {
+        this.instructorEmail = instructorEmail;
     }
 }
