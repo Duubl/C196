@@ -182,6 +182,109 @@ public class AssessmentsActivity extends AppCompatActivity {
     }
 
     /**
+     * Opens the input dialog for adding a new instructor.
+     * Takes input from the user for the name, phone number and address for the instructor.
+     * @param assessment the assessment being modified
+     */
+
+    private void openInputDialog(Assessment assessment) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Modify Assessment");
+
+        LinearLayout inputLayout = new LinearLayout(this);
+        inputLayout.setOrientation(LinearLayout.VERTICAL);
+        inputLayout.setPadding(16, 16, 16, 16);
+
+        // Get the instructor name
+        final EditText nameInput = new EditText(this);
+        nameInput.setHint("Assessment Name");
+        nameInput.setText(assessment.getName());
+        inputLayout.addView(nameInput);
+
+        final Button startDateButton = new Button(this);
+        startDateButton.setText(assessment.getStartDate().toString());
+        inputLayout.addView(startDateButton);
+
+        final LocalDate[] localStartDate = new LocalDate[1];
+        localStartDate[0] = assessment.getStartDate();
+        startDateButton.setOnClickListener(v -> {
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localStartDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                startDateButton.setText(localStartDate[0].toString());
+            }, year, month, day).show();
+        });
+
+        final Button endDateButton = new Button(this);
+        endDateButton.setText(assessment.getEndDate().toString());
+        inputLayout.addView(endDateButton);
+
+        final LocalDate[] localEndDate = new LocalDate[1];
+        localEndDate[0] = assessment.getEndDate();
+        endDateButton.setOnClickListener(v -> {
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localEndDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                endDateButton.setText(localEndDate[0].toString());
+            }, year, month, day).show();
+        });
+
+        final Button assessmentTypeButton = new Button(this);
+        assessmentTypeButton.setText(assessment.getType().name());
+        final AssessmentType[] type = new AssessmentType[1];
+        type[0] = assessment.getType();
+        inputLayout.addView(assessmentTypeButton);
+        assessmentTypeButton.setOnClickListener(v -> {
+            AssessmentType[] assessmentTypes = AssessmentType.values();
+            String[] options = new String[assessmentTypes.length];
+            for (int i = 0; i < assessmentTypes.length; i++) {
+                options[i] = assessmentTypes[i].name();
+            }
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Select Assessment Type")
+                    .setItems(options, (dialog, which) -> {
+                        assessmentTypeButton.setText(options[which]);
+                        type[0] = assessmentTypes[which];
+                    })
+                    .create()
+                    .show();
+        });
+        builder.setView(inputLayout);
+
+        // Creates the button on submit if all fields contain information.
+        // TODO: Add error checking and proper formatting checking
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String assessmentName = nameInput.getText().toString().trim();
+            if (assessmentName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                modifyAssessment(assessment, assessmentName, localStartDate[0], localEndDate[0], type[0]);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            Log.d("AssessmentsActivity", "Sent data to create new assessment " + assessmentName);
+            try {
+                populateAssessmentCards();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    /**
      * Creates a new assessment
      * @param name the name of the assessment
      * @param startDate the start date of the assessment
@@ -193,6 +296,24 @@ public class AssessmentsActivity extends AppCompatActivity {
         Assessment assessment = new Assessment(0, name, startDate, endDate, type);
         repository.insert(assessment);
         assessments.add(assessment);
+    }
+
+    /**
+     * Modifies an assessment
+     * @param assessment the assessment being modified
+     * @param name the new name for the assessment
+     * @param startDate the new start date for the assessment
+     * @param endDate the new end date for the assessment
+     * @param type the new type for the assessment
+     * @throws InterruptedException
+     */
+
+    private void modifyAssessment(Assessment assessment, String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException {
+        repository = new Repository(getApplication());
+        Assessment newAssessment = new Assessment(assessment.getAssessmentID(), name, startDate, endDate, type);
+        repository.update(newAssessment);
+        assessments.remove(assessment);
+        assessments.add(newAssessment);
     }
 
     /**
@@ -227,14 +348,14 @@ public class AssessmentsActivity extends AppCompatActivity {
         ));
 
         // Create button
-        Button instructorButton = new Button(this);
-        instructorButton.setText(assessment.getName());
-        instructorButton.setLayoutParams(new LinearLayout.LayoutParams(
+        Button assessmentButton = new Button(this);
+        assessmentButton.setText(assessment.getName());
+        assessmentButton.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
-        instructorButton.setBackgroundColor(ContextCompat.getColor(this, R.color.tertiary));
-        instructorButton.setTextColor(ContextCompat.getColor(this, R.color.primary_variant));
+        assessmentButton.setBackgroundColor(ContextCompat.getColor(this, R.color.tertiary));
+        assessmentButton.setTextColor(ContextCompat.getColor(this, R.color.primary_variant));
 
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
@@ -260,7 +381,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         expandableLayout.addView(assignedCoursesView);
 
         // Button click listener to toggle expandable layout
-        instructorButton.setOnClickListener(v -> {
+        assessmentButton.setOnClickListener(v -> {
             boolean isExpanded = expandableLayout.getVisibility() == View.VISIBLE;
             expandableLayout.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
             expandedStates.put(assessment.getAssessmentID(), !isExpanded);
@@ -269,6 +390,12 @@ public class AssessmentsActivity extends AppCompatActivity {
                 parentLayout.requestLayout();
                 parentLayout.invalidate();
             });
+        });
+
+        // Long press listener to open edit menu
+        assessmentButton.setOnLongClickListener(v -> {
+            openInputDialog(assessment);
+            return true;
         });
 
         // TODO: Fix. Doesn't show assigned courses properly. Check and ensure foreign keys are pointing to the right areas.
@@ -291,7 +418,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         }
 
         // Add button and expandable layout to the card layout
-        cardLayout.addView(instructorButton);
+        cardLayout.addView(assessmentButton);
         cardLayout.addView(expandableLayout);
 
         // Add card layout to the card view

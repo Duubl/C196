@@ -1,6 +1,7 @@
 package com.duubl.c196.database;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.duubl.c196.dao.AssessmentDAO;
 import com.duubl.c196.dao.CourseDAO;
@@ -147,8 +148,12 @@ public class Repository {
     public List<Course> getAllAssessmentCourses(Assessment assessment) throws InterruptedException {
         database_executor.execute(() -> {
             all_courses = assessment_dao.getAllAssessmentCourses(assessment.getAssessmentID());
+            if (!all_courses.isEmpty()) {
+                Log.d("Repository", "Got a course for assessment: " + assessment.getName());
+            } else {
+                Log.e("Repository", "Pulled no assessments for " + assessment.getName());
+            }
         });
-
         Thread.sleep(1000);
         return all_courses;
     }
