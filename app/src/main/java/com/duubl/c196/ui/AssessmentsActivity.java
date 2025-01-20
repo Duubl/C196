@@ -26,6 +26,8 @@ import com.duubl.c196.entities.AssessmentType;
 import com.duubl.c196.entities.Course;
 import com.duubl.c196.entities.Instructor;
 
+import org.w3c.dom.Text;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -375,6 +377,10 @@ public class AssessmentsActivity extends AppCompatActivity {
         TextView endTextView = new TextView(this);
         endTextView.setText("End Date: " + assessment.getEndDate());
         expandableLayout.addView(endTextView);
+
+        TextView typeTextView = new TextView(this);
+        typeTextView.setText("\nAssessment Type: " + assessment.getType().name());
+        expandableLayout.addView(typeTextView);
 
         TextView assignedCoursesView = new TextView(this);
         assignedCoursesView.setText("\nAssigned course: ");
