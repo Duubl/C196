@@ -1,12 +1,8 @@
 package com.duubl.c196.entities;
 
-import android.util.Log;
-
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 @Entity(tableName = "courses")
 public class Course {

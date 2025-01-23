@@ -249,6 +249,9 @@ public class CoursesActivity extends AppCompatActivity {
 
     private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, List<Instructor> instructors, List<Assessment> assessments) throws InterruptedException {
         repository = new Repository(getApplication());
+
+        // TODO: Allow for automatically generated course IDs instead of using 0.
+        // Replace int value to be an Integer and have it auto generate.
         Course course = new Course(0, 0, name, startDate, endDate, status);
         for (Instructor instructor : instructors) {
             instructor.setCourseID(course.getCourseID());
