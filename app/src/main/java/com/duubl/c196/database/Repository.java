@@ -136,25 +136,36 @@ public class Repository {
         return all_courses;
     }
 
+    /**
+     * Gets the course the instructor is assigned to.
+     * @param instructor the assessment to check.
+     * @return all_courses, being an array of all courses the instructor is assigned to. Returns an empty arraylist if nothing is found.
+     * @throws InterruptedException
+     */
+
     public List<Course> getAllInstructorCourses(Instructor instructor) throws InterruptedException {
         database_executor.execute(() -> {
             all_courses = instructor_dao.getAllInstructorCourses(instructor.getCourseID());
         });
 
         Thread.sleep(1000);
-        return all_courses;
+        return all_courses != null ? all_courses : new ArrayList<>();
     }
+
+    /**
+     * Gets the course the assessment is assigned to.
+     * @param assessment the assessment to check.
+     * @return all_courses, being an array of all courses the assessment is assigned to. Returns an empty arraylist if nothing is found.
+     * @throws InterruptedException
+     */
 
     public List<Course> getAllAssessmentCourses(Assessment assessment) throws InterruptedException {
         database_executor.execute(() -> {
             all_courses = assessment_dao.getAllAssessmentCourses(assessment.getAssessmentID());
-            if (!all_courses.isEmpty()) {
-                Log.d("Repository", "Got a course for assessment: " + assessment.getName());
-            } else {
-                Log.e("Repository", "Pulled no courses for " + assessment.getName());
-            }
         });
-        return all_courses;
+
+        Thread.sleep(1000);
+        return all_courses != null ? all_courses : new ArrayList<>();
     }
 
     /**

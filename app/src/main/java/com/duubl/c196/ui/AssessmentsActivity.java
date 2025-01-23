@@ -410,6 +410,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         if (assignedCourses != null) {
             if (!assignedCourses.isEmpty()) {
                 for (Course course : assignedCourses) {
+                    Log.d("AssessmentsActivity", "Created course button for assessment: " + assessment.getName() + " Course: " + course.getCourseName());
                     Button c = new Button(this);
                     c.setText(course.getCourseName());
                     expandableLayout.addView(c);
@@ -422,6 +423,8 @@ public class AssessmentsActivity extends AppCompatActivity {
                 noCourses.setText("Not assigned to any courses!");
                 expandableLayout.addView(noCourses);
             }
+        } else {
+            Log.e("AssessmentsActivity", "assignedCourses is NULL!");
         }
 
         // Add button and expandable layout to the card layout
