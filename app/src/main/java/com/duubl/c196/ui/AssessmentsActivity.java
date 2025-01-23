@@ -379,7 +379,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         expandableLayout.addView(endTextView);
 
         TextView typeTextView = new TextView(this);
-        typeTextView.setText("\nAssessment Type: " + assessment.getType().name());
+        typeTextView.setText("\nAssessment Type:\n" + assessment.getType().name());
         expandableLayout.addView(typeTextView);
 
         TextView assignedCoursesView = new TextView(this);
@@ -408,19 +408,21 @@ public class AssessmentsActivity extends AppCompatActivity {
         // Could be because of the default foreign key values created.
 
         List<Course> assignedCourses = repository.getAllAssessmentCourses(assessment);
-        if (!assignedCourses.isEmpty()) {
-            for (Course course : assignedCourses) {
-                Button c = new Button(this);
-                c.setText(course.getCourseName());
-                expandableLayout.addView(c);
-                c.setOnClickListener(v -> {
-                    startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
-                });
+        if (assignedCourses != null) {
+            if (!assignedCourses.isEmpty()) {
+                for (Course course : assignedCourses) {
+                    Button c = new Button(this);
+                    c.setText(course.getCourseName());
+                    expandableLayout.addView(c);
+                    c.setOnClickListener(v -> {
+                        startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
+                    });
+                }
+            } else {
+                TextView noCourses = new TextView(this);
+                noCourses.setText("Not assigned to any courses!");
+                expandableLayout.addView(noCourses);
             }
-        } else {
-            TextView noCourses = new TextView(this);
-            noCourses.setText("Not assigned to any courses!");
-            expandableLayout.addView(noCourses);
         }
 
         // Add button and expandable layout to the card layout

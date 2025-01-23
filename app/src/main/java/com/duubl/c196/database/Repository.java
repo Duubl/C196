@@ -151,7 +151,7 @@ public class Repository {
             if (!all_courses.isEmpty()) {
                 Log.d("Repository", "Got a course for assessment: " + assessment.getName());
             } else {
-                Log.e("Repository", "Pulled no assessments for " + assessment.getName());
+                Log.e("Repository", "Pulled no courses for " + assessment.getName());
             }
         });
         return all_courses;
