@@ -15,10 +15,6 @@ public class Course {
     private int courseID;
     // Foreign key
     private int termID;
-    // Foreign key
-    private int instructorID;
-    // Foreign key
-    private int assessmentID;
     private String courseName;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -79,21 +75,5 @@ public class Course {
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public int getInstructorID() {
-        return instructorID;
-    }
-
-    public void setInstructorID(int instructorID) {
-        this.instructorID = instructorID;
-    }
-
-    public int getAssessmentID() {
-        return assessmentID;
-    }
-
-    public void setAssessmentID(int assessmentID) {
-        this.assessmentID = assessmentID;
     }
 }

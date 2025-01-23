@@ -30,6 +30,6 @@ public interface InstructorDAO {
     @Query("SELECT * FROM instructors WHERE instructorID=:course_id ORDER BY instructorID ASC")
     List<Instructor> getCourseInstructors(int course_id);
 
-    @Query("SELECT * FROM courses WHERE instructorID=:instructor_id ORDER BY courseID ASC")
-    List<Course> getAllInstructorCourses(int instructor_id);
+    @Query("SELECT * FROM courses WHERE courseID=:course_id ORDER BY courseID ASC")
+    List<Course> getAllInstructorCourses(int course_id);
 }

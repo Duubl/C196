@@ -274,7 +274,6 @@ public class AssessmentsActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            Log.d("AssessmentsActivity", "Sent data to create new assessment " + assessmentName);
             try {
                 populateAssessmentCards();
             } catch (InterruptedException e) {

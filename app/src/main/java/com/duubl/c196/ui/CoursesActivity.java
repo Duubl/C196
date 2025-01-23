@@ -254,6 +254,7 @@ public class CoursesActivity extends AppCompatActivity {
             instructor.setCourseID(course.getCourseID());
         }
         for (Assessment assessment : assessments) {
+            Log.d("CoursesActivity", "Assigned assessment " + assessment.getName() + " course ID: " + course.getCourseID());
             assessment.setCourseID(course.getCourseID());
         }
         repository.insert(course);
