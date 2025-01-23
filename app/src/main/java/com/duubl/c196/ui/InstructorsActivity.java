@@ -153,8 +153,6 @@ public class InstructorsActivity extends AppCompatActivity {
 
     private void createNewInstructor( String name, String phone, String email) throws InterruptedException {
         repository = new Repository(getApplication());
-
-        // TODO: Change this so the IDS are set when created. Right now they default to 0.
         Instructor instructor = new Instructor(0, 0, name, phone, email);
         repository.insert(instructor);
         instructors.add(instructor);
@@ -238,19 +236,21 @@ public class InstructorsActivity extends AppCompatActivity {
         });
 
         List<Course> assignedCourses = repository.getAllInstructorCourses(instructor);
-        if (!assignedCourses.isEmpty()) {
-            for (Course course : assignedCourses) {
-                Button c = new Button(this);
-                c.setText(course.getCourseName());
-                expandableLayout.addView(c);
-                c.setOnClickListener(v -> {
-                    startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
-                });
+        if (assignedCourses != null) {
+            if (!assignedCourses.isEmpty()) {
+                for (Course course : assignedCourses) {
+                    Button c = new Button(this);
+                    c.setText(course.getCourseName());
+                    expandableLayout.addView(c);
+                    c.setOnClickListener(v -> {
+                        startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
+                    });
+                }
+            } else {
+                TextView noCourses = new TextView(this);
+                noCourses.setText("Not assigned to any courses!");
+                expandableLayout.addView(noCourses);
             }
-        } else {
-            TextView noCourses = new TextView(this);
-            noCourses.setText("Not assigned to any courses!");
-            expandableLayout.addView(noCourses);
         }
 
         // Add button and expandable layout to the card layout
