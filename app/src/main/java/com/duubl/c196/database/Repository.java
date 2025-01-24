@@ -86,7 +86,7 @@ public class Repository {
 
     public void delete(int term_id) throws InterruptedException {
         for (Term term : all_terms) {
-            if (term.getTerm_id() == term_id) {
+            if (term.getTermID() == term_id) {
                 term_dao.delete(term);
             }
         }
@@ -129,7 +129,7 @@ public class Repository {
 
     public List<Course> getAllTermCourses(Term term) throws InterruptedException {
         database_executor.execute(()-> {
-            all_courses = term_dao.getTermCourses(term.getTerm_id());
+            all_courses = term_dao.getTermCourses(term.getTermID());
         });
 
         Thread.sleep(1000);

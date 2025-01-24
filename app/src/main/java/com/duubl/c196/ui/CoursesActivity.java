@@ -58,7 +58,7 @@ public class CoursesActivity extends AppCompatActivity {
         // Layout for the list of courses.
         courseLayout = findViewById(R.id.courses_list_layout);
         if (courseLayout == null) {
-            Log.e("coursesActivity", "courseLayout is null!");
+            Log.e("CoursesActivity", "courseLayout is null!");
             return;
         }
 
@@ -73,7 +73,7 @@ public class CoursesActivity extends AppCompatActivity {
         try {
             courses = repository.getAllCourses();
         } catch (InterruptedException e) {
-            Log.e("coursesActivity", "there are no courses!");
+            Log.e("CoursesActivity", "there are no courses!");
             throw new RuntimeException(e);
         }
         try {
@@ -226,7 +226,6 @@ public class CoursesActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            Log.d("coursesActivity", "Sent data to create new course " + courseName);
             try {
                 populateCourseCards();
             } catch (InterruptedException e) {
@@ -244,6 +243,8 @@ public class CoursesActivity extends AppCompatActivity {
      * @param startDate the start date of the course
      * @param endDate the end date of the course
      * @param status the status of the course
+     * @param instructors the instructors to be added to the course
+     * @param assessments the assessments to be added to the course
      * @throws InterruptedException
      */
 
@@ -257,7 +258,6 @@ public class CoursesActivity extends AppCompatActivity {
             instructor.setCourseID(course.getCourseID());
         }
         for (Assessment assessment : assessments) {
-            Log.d("CoursesActivity", "Assigned assessment " + assessment.getName() + " course ID: " + course.getCourseID());
             assessment.setCourseID(course.getCourseID());
         }
         repository.insert(course);
@@ -296,14 +296,14 @@ public class CoursesActivity extends AppCompatActivity {
         ));
 
         // Create button
-        Button instructorButton = new Button(this);
-        instructorButton.setText(course.getCourseName());
-        instructorButton.setLayoutParams(new LinearLayout.LayoutParams(
+        Button courseButton = new Button(this);
+        courseButton.setText(course.getCourseName());
+        courseButton.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
-        instructorButton.setBackgroundColor(ContextCompat.getColor(this, R.color.tertiary));
-        instructorButton.setTextColor(ContextCompat.getColor(this, R.color.primary_variant));
+        courseButton.setBackgroundColor(ContextCompat.getColor(this, R.color.tertiary));
+        courseButton.setTextColor(ContextCompat.getColor(this, R.color.primary_variant));
 
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
@@ -357,7 +357,7 @@ public class CoursesActivity extends AppCompatActivity {
         }
 
         // Button click listener to toggle expandable layout
-        instructorButton.setOnClickListener(v -> {
+        courseButton.setOnClickListener(v -> {
             boolean isExpanded = expandableLayout.getVisibility() == View.VISIBLE;
             expandableLayout.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
             expandedStates.put(course.getCourseID(), !isExpanded);
@@ -369,7 +369,7 @@ public class CoursesActivity extends AppCompatActivity {
         });
 
         // Add button and expandable layout to the card layout
-        cardLayout.addView(instructorButton);
+        cardLayout.addView(courseButton);
         cardLayout.addView(expandableLayout);
 
         // Add card layout to the card view

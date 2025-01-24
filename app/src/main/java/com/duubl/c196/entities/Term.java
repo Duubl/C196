@@ -9,43 +9,39 @@ import java.time.LocalDate;
 public class Term {
 
     @PrimaryKey(autoGenerate = true)
-    private int term_id;
-    private String term_name;
-    private LocalDate start_date;
-    private LocalDate end_date;
+    private int termID;
+    private String termName;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    public Term(int term_id, String term_name, LocalDate start_date, LocalDate end_date) {
-        this.term_id = term_id;
-        this.term_name = term_name;
-        this.start_date = start_date;
-        this.end_date = end_date;
+    public Term(int termID, String termName, LocalDate startDate, LocalDate endDate) {
+        this.termID = termID;
+        this.termName = termName;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
-    public int getTerm_id() {
-        return this.term_id;
+    public int getTermID() {
+        return termID;
     }
 
-    public void setTermName(String name) {
-        this.term_name = name;
+    public void setTermID(int termID) {
+        this.termID = termID;
     }
 
-    public String getTerm_name() {
-        return this.term_name;
+    public String getTermName() {
+        return termName;
     }
 
-    public LocalDate getStart_date() {
-        return start_date;
+    public void setTermName(String termName) {
+        this.termName = termName;
     }
 
-    public void setStart_date(LocalDate start_date) {
-        this.start_date = start_date;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public LocalDate getEnd_date() {
-        return end_date;
-    }
-
-    public void setEnd_date(LocalDate end_date) {
-        this.end_date = end_date;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 }
