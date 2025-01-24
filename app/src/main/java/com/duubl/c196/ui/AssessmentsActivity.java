@@ -403,9 +403,6 @@ public class AssessmentsActivity extends AppCompatActivity {
             return true;
         });
 
-        // TODO: Fix. Doesn't show assigned courses properly. Check and ensure foreign keys are pointing to the right areas.
-        // Could be because of the default foreign key values created.
-
         List<Course> assignedCourses = repository.getAllAssessmentCourses(assessment);
         if (assignedCourses != null) {
             if (!assignedCourses.isEmpty()) {
