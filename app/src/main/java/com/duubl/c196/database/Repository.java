@@ -167,7 +167,7 @@ public class Repository {
      */
 
     public List<Course> getAllInstructorCourses(Instructor instructor) {
-        Callable<List<Course>> task = () -> instructor_dao.getAllInstructorCourses(instructor.getInstructorID());
+        Callable<List<Course>> task = () -> instructor_dao.getAllInstructorCourses(instructor.getCourseID());
         FutureTask<List<Course>> future = new FutureTask<>(task);
         database_executor.execute(future);
         try {
@@ -186,7 +186,7 @@ public class Repository {
      */
 
     public List<Course> getAllAssessmentCourses(Assessment assessment) throws InterruptedException {
-        Callable<List<Course>> task = () -> all_courses = assessment_dao.getAllAssessmentCourses(assessment.getAssessmentID());
+        Callable<List<Course>> task = () -> all_courses = assessment_dao.getAllAssessmentCourses(assessment.getCourseID());
         FutureTask<List<Course>> future = new FutureTask<>(task);
         database_executor.execute(future);
         try {
