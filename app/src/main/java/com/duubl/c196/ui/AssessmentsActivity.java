@@ -318,6 +318,7 @@ public class AssessmentsActivity extends AppCompatActivity {
     private void modifyAssessment(Assessment assessment, String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
         Assessment newAssessment = new Assessment(assessment.getAssessmentID(), name, startDate, endDate, type);
+        newAssessment.setCourseID(assessment.getCourseID());
         repository.update(newAssessment);
         assessments.remove(assessment);
         assessments.add(newAssessment);

@@ -98,15 +98,9 @@ public class TermsActivity extends AppCompatActivity {
         inputLayout.setOrientation(LinearLayout.VERTICAL);
         inputLayout.setPadding(16, 16, 16, 16);
 
-        // Get term name
         final EditText termInput = new EditText(this);
         termInput.setHint("Enter term name");
         inputLayout.addView(termInput);
-
-        // Get start date
-        final TextView startDateText = new TextView(this);
-        startDateText.setText("Start Date:");
-        inputLayout.addView(startDateText);
 
         final Button startDateButton = new Button(this);
         startDateButton.setText("Select Start Date");
@@ -124,11 +118,6 @@ public class TermsActivity extends AppCompatActivity {
             }, year, month, day).show();
         });
 
-        // Get end date
-        final TextView endDateText = new TextView(this);
-        endDateText.setText("End Date:");
-        inputLayout.addView(endDateText);
-
         final Button endDateButton = new Button(this);
         endDateButton.setText("Select End Date");
         inputLayout.addView(endDateButton);
@@ -145,10 +134,6 @@ public class TermsActivity extends AppCompatActivity {
             }, year, month, day).show();
         });
 
-        final TextView assignCourseText = new TextView(this);
-        assignCourseText.setText("Assign Courses:");
-        inputLayout.addView(assignCourseText);
-
         final Button newTermCourseButton = new Button(this);
         newTermCourseButton.setText("Assign Courses");
         inputLayout.addView(newTermCourseButton);
@@ -159,23 +144,41 @@ public class TermsActivity extends AppCompatActivity {
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
+
             String[] courseOptions = new String[courses.size()];
             for (int i = 0; i < courses.size(); i++) {
                 courseOptions[i] = courses.get(i).getCourseName();
             }
 
-            // TODO: Prevent duplicate courses from being assigned to the same term
-
-            // TODO: Disappearing assigned courses.
+            boolean[] selectedItems = new boolean[courses.size()];
 
             new AlertDialog.Builder(this)
-                    .setTitle("Assign Course")
-                    .setItems(courseOptions, (dialog, which) -> {
-                        newTermCourseButton.setText(courseOptions[which]);
-                        assignedCourses.add(courses.get(which));
-                        Log.d("TermsActivity", "Got course to be assigned: " + courses.get(which).getCourseName());
-                        Log.d("TermsActivity", "assignedCourses: " + assignedCourses.get(0).getCourseName());
+                    .setTitle("Assign Courses")
+                    .setMultiChoiceItems(courseOptions, selectedItems, (dialog, which, isChecked) -> {
+                        selectedItems[which] = isChecked;
                     })
+                    .setPositiveButton("Save", (dialog, which) -> {
+                        for (int i = 0; i < selectedItems.length; i++) {
+                            if (selectedItems[i]) {
+                                if (!assignedCourses.contains(courses.get(i))) {
+                                    assignedCourses.add(courses.get(i));
+                                    Log.d("TermsActivity", "Assigned course: " + courses.get(i).getCourseName());
+                                }
+                            }
+                        }
+
+                        if (!assignedCourses.isEmpty()) {
+                            StringBuilder buttonText = new StringBuilder("Assigned Courses:\n");
+                            for (Course assignedCourse : assignedCourses) {
+                                buttonText.append(assignedCourse.getCourseName()).append(",\n");
+                            }
+                            buttonText.setLength(buttonText.length() - 2);
+                            newTermCourseButton.setText(buttonText.toString());
+                        } else {
+                            newTermCourseButton.setText("Assign Courses");
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
                     .create()
                     .show();
         });
