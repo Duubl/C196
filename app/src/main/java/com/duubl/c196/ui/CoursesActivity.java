@@ -351,6 +351,8 @@ public class CoursesActivity extends AppCompatActivity {
         assignedAssessmentsView.setText("\nAssigned Assessments: ");
         expandableLayout.addView(assignedAssessmentsView);
 
+        // TODO: Assessments & instructors showing on wrong courses
+
         List<Assessment> assignedAssessments = repository.getAllCourseAssessments(course);
         if (!assignedInstructors.isEmpty()) {
             for (Assessment assessment : assignedAssessments) {
