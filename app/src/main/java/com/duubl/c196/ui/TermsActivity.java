@@ -229,7 +229,8 @@ public class TermsActivity extends AppCompatActivity {
 
         for (Course course : courses) {
             course.setTermID(term.getTermID());
-            repository.update(course);}
+            repository.update(course);
+        }
         terms.add(term);
     }
 
