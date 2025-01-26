@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class CoursesActivity extends AppCompatActivity {
 
@@ -72,13 +73,13 @@ public class CoursesActivity extends AppCompatActivity {
         repository = new Repository(getApplication());
         try {
             courses = repository.getAllCourses();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Log.e("CoursesActivity", "there are no courses!");
             throw new RuntimeException(e);
         }
         try {
             populateCourseCards();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
@@ -165,7 +166,7 @@ public class CoursesActivity extends AppCompatActivity {
             List<Instructor> instructors;
             try {
                 instructors = repository.getAllInstructors();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
             String[] instructorOptions = new String[instructors.size()];
@@ -192,7 +193,7 @@ public class CoursesActivity extends AppCompatActivity {
             List<Assessment> assessments;
             try {
                 assessments = repository.getAllAssessments();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
             String[] assessmentOptions = new String[assessments.size()];
@@ -223,12 +224,12 @@ public class CoursesActivity extends AppCompatActivity {
 
             try {
                 createNewCourse(courseName, localStartDate[0], localEndDate[0], status[0], assignedInstructors, assignedAssessments);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
             try {
                 populateCourseCards();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -248,7 +249,7 @@ public class CoursesActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, List<Instructor> instructors, List<Assessment> assessments) throws InterruptedException {
+    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, List<Instructor> instructors, List<Assessment> assessments) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
 
         // TODO: Allow for automatically generated course IDs instead of using 0.
@@ -269,7 +270,7 @@ public class CoursesActivity extends AppCompatActivity {
      * @param course the course to have the button created for
      */
 
-    private void createCourseButton(Course course) throws InterruptedException {
+    private void createCourseButton(Course course) throws InterruptedException, ExecutionException {
         LinearLayout parentLayout = findViewById(R.id.courses_list_layout);
         parentLayout.setPadding(parentLayout.getPaddingLeft(),
                 parentLayout.getPaddingTop(),
@@ -383,7 +384,7 @@ public class CoursesActivity extends AppCompatActivity {
      * Popuates the course cards in the activity
      */
 
-    private void populateCourseCards() throws InterruptedException {
+    private void populateCourseCards() throws InterruptedException, ExecutionException {
         if (courseLayout != null) {
             courseLayout.removeAllViews();
         }

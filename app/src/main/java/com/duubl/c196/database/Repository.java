@@ -15,8 +15,11 @@ import com.duubl.c196.entities.Term;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
 public class Repository {
@@ -47,62 +50,83 @@ public class Repository {
      * Pulls all the terms from the database
      * @return all_terms, a list of all the terms
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public List<Term> getAllTerms() throws InterruptedException {
-        database_executor.execute(()-> {
-            all_terms = term_dao.getAllTerms();
-        });
-
-        Thread.sleep(1000);
-        return all_terms;
+    public List<Term> getAllTerms() throws InterruptedException, ExecutionException {
+        Callable<List<Term>> task = () -> all_terms = term_dao.getAllTerms();
+        FutureTask<List<Term>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        return future.get();
     }
 
     /**
      * Inserts a new term into the database
      * @param term the term to be inserted
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void insert(Term term) throws InterruptedException {
-        database_executor.execute(() -> {
-            term_dao.insert(term);
-        });
-            Thread.sleep(1000);
+    public long insert(Term term) throws InterruptedException, ExecutionException {
+        Callable<Long> task = () -> term_dao.insert(term);
+        FutureTask<Long> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        return future.get();
     }
 
     /**
      * Deletes the given term
      * @param term the term to be deleted
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void delete(Term term) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void delete(Term term) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             term_dao.delete(term);
-        });
-            Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
-    public void delete(int term_id) throws InterruptedException {
-        for (Term term : all_terms) {
-            if (term.getTermID() == term_id) {
-                term_dao.delete(term);
+    /**
+     * Deletes the term by id
+     * @param term_id the id of the term to be deleted
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+
+    public void delete(int term_id) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
+            for (Term term : all_terms) {
+                if (term.getTermID() == term_id) {
+                    term_dao.delete(term);
+                }
             }
-        }
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     /**
      * Updates the given term
      * @param term the term to be updated
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void update(Term term) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void update(Term term) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             term_dao.update(term);
-        });
-            Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     // Courses
@@ -111,13 +135,17 @@ public class Repository {
      * Inserts a new course into the database
      * @param course the course to be inserted
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void insert(Course course) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void insert(Course course) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             course_dao.insert(course);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     /**
@@ -125,31 +153,32 @@ public class Repository {
      * @return all_courses, a list of all the courses assigned to the given term
      * @param term the term to find the courses for
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public List<Course> getAllTermCourses(Term term) throws InterruptedException {
-        database_executor.execute(()-> {
-            all_courses = term_dao.getTermCourses(term.getTermID());
-        });
-
-        Thread.sleep(1000);
-        return all_courses;
+    public List<Course> getAllTermCourses(Term term) throws InterruptedException, ExecutionException {
+        Callable<List<Course>> task = () -> all_courses = term_dao.getTermCourses(term.getTermID());
+        FutureTask<List<Course>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        return future.get();
     }
 
     /**
      * Gets the course the instructor is assigned to.
      * @param instructor the assessment to check.
      * @return all_courses, being an array of all courses the instructor is assigned to. Returns an empty arraylist if nothing is found.
-     * @throws InterruptedException
      */
 
-    public List<Course> getAllInstructorCourses(Instructor instructor) throws InterruptedException {
-        database_executor.execute(() -> {
-            all_courses = instructor_dao.getAllInstructorCourses(instructor.getInstructorID());
-        });
-
-        Thread.sleep(1000);
-        return all_courses != null ? all_courses : new ArrayList<>();
+    public List<Course> getAllInstructorCourses(Instructor instructor) {
+        Callable<List<Course>> task = () -> instructor_dao.getAllInstructorCourses(instructor.getInstructorID());
+        FutureTask<List<Course>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        try {
+            return future.get();
+        } catch (Exception e) {
+            Log.e("Repository", "Error fetching instructor courses: ", e);
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -160,53 +189,63 @@ public class Repository {
      */
 
     public List<Course> getAllAssessmentCourses(Assessment assessment) throws InterruptedException {
-        database_executor.execute(() -> {
-            all_courses = assessment_dao.getAllAssessmentCourses(assessment.getAssessmentID());
-        });
-
-        Thread.sleep(1000);
-        return all_courses != null ? all_courses : new ArrayList<>();
+        Callable<List<Course>> task = () -> all_courses = assessment_dao.getAllAssessmentCourses(assessment.getAssessmentID());
+        FutureTask<List<Course>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        try {
+            return future.get();
+        } catch (Exception e) {
+            Log.e("Repository", "Error fetching assessment courses: ", e);
+            return new ArrayList<>();
+        }
     }
 
     /**
      * Pulls all the courses from the database
      * @return all_courses, a list of all the courses
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public List<Course> getAllCourses() throws InterruptedException {
-        database_executor.execute(()-> {
-            all_courses = course_dao.getAllCourses();
-        });
-
-        Thread.sleep(1000);
-        return all_courses;
+    public List<Course> getAllCourses() throws InterruptedException, ExecutionException {
+        Callable<List<Course>> task = () -> all_courses = course_dao.getAllCourses();
+        FutureTask<List<Course>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        return future.get();
     }
 
     /**
      * Deletes the given course
      * @param course the course to be deleted
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void delete(Course course) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void delete(Course course) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             course_dao.delete(course);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     /**
      * Updates the given course
      * @param course the course to be updated
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void update(Course course) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void update(Course course) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             course_dao.update(course);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     // Instructors
@@ -215,13 +254,17 @@ public class Repository {
      * Inserts a new instructor into the database
      * @param instructor the instructor to be inserted
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void insert(Instructor instructor) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void insert(Instructor instructor) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             instructor_dao.insert(instructor);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     /**
@@ -229,56 +272,62 @@ public class Repository {
      * @return all_instructors, a list of all the course instructors
      * @param course the course to find the instructors for
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public List<Instructor> getAllCourseInstructors(Course course) throws InterruptedException {
-        database_executor.execute(()-> {
-            all_instructors = course_dao.getCourseInstructors(course.getCourseID());
-        });
-
-        Thread.sleep(1000);
-        return all_instructors;
+    public List<Instructor> getAllCourseInstructors(Course course) throws InterruptedException, ExecutionException {
+        Callable<List<Instructor>> task = () -> all_instructors = course_dao.getCourseInstructors(course.getCourseID());
+        FutureTask<List<Instructor>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        return future.get();
     }
 
     /**
      * Pulls all the instructors from the database
      * @return all_instructors, a list of all the instructors
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public List<Instructor> getAllInstructors() throws InterruptedException {
-        database_executor.execute(()-> {
-            all_instructors = instructor_dao.getAllInstructors();
-        });
-
-        Thread.sleep(1000);
-        return all_instructors;
+    public List<Instructor> getAllInstructors() throws InterruptedException, ExecutionException {
+        Callable<List<Instructor>> task = () -> all_instructors = instructor_dao.getAllInstructors();
+        FutureTask<List<Instructor>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        return future.get();
     }
 
     /**
      * Deletes the given instructor
      * @param instructor the instructor to be deleted
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void delete(Instructor instructor) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void delete(Instructor instructor) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             instructor_dao.delete(instructor);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     /**
      * Updates the given instructor
      * @param instructor the instructor to be updated
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void update(Instructor instructor) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void update(Instructor instructor) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             instructor_dao.update(instructor);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     // Assessments
@@ -287,28 +336,31 @@ public class Repository {
      * Inserts a new assessment into the database
      * @param assessment the assessment to be inserted
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void insert(Assessment assessment) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void insert(Assessment assessment) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             assessment_dao.insert(assessment);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     /**
      * Pulls all the assessments from the database
      * @return all_assessments, a list of all the assessments
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public List<Assessment> getAllAssessments() throws InterruptedException {
-        database_executor.execute(()-> {
-            all_assessments = assessment_dao.getAllAssessments();
-        });
-
-        Thread.sleep(1000);
-        return all_assessments;
+    public List<Assessment> getAllAssessments() throws InterruptedException, ExecutionException {
+        Callable<List<Assessment>> task = () -> all_assessments = assessment_dao.getAllAssessments();
+        FutureTask<List<Assessment>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        return future.get();
     }
 
     /**
@@ -316,40 +368,47 @@ public class Repository {
      * @return all_assessments, a list of all the assessments assigned to the given course
      * @param course the course to find the assessments for
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public List<Assessment> getAllCourseAssessments(Course course) throws InterruptedException {
-        database_executor.execute(()-> {
-            all_assessments = course_dao.getCourseAssessments(course.getCourseID());
-        });
-
-        Thread.sleep(1000);
-        return all_assessments;
+    public List<Assessment> getAllCourseAssessments(Course course) throws InterruptedException, ExecutionException {
+        Callable<List<Assessment>> task = () -> all_assessments = course_dao.getCourseAssessments(course.getCourseID());
+        FutureTask<List<Assessment>> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        return future.get();
     }
 
     /**
      * Deletes the given assessment
      * @param assessment the assessment to be deleted
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void delete(Assessment assessment) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void delete(Assessment assessment) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             assessment_dao.delete(assessment);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 
     /**
      * Updates the given assessment
      * @param assessment the assessment to be updated
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
-    public void update(Assessment assessment) throws InterruptedException {
-        database_executor.execute(() -> {
+    public void update(Assessment assessment) throws InterruptedException, ExecutionException {
+        Callable<Void> task = () -> {
             assessment_dao.update(assessment);
-        });
-        Thread.sleep(1000);
+            return null;
+        };
+        FutureTask<Void> future = new FutureTask<>(task);
+        database_executor.execute(future);
+        future.get();
     }
 }

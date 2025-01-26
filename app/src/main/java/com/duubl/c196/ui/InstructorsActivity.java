@@ -31,6 +31,7 @@ import com.duubl.c196.entities.Instructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class InstructorsActivity extends AppCompatActivity {
 
@@ -72,7 +73,7 @@ public class InstructorsActivity extends AppCompatActivity {
         repository = new Repository(getApplication());
         try {
             instructors = repository.getAllInstructors();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Log.e("InstructorsActivity", "there are no instructors!");
             throw new RuntimeException(e);
         }
@@ -128,7 +129,7 @@ public class InstructorsActivity extends AppCompatActivity {
 
             try {
                 createNewInstructor(instructorName, instructorPhone, instructorEmail);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
             Log.d("InstructorsActivity", "Sent data to create new instructor " + instructorName);
@@ -151,7 +152,7 @@ public class InstructorsActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void createNewInstructor( String name, String phone, String email) throws InterruptedException {
+    private void createNewInstructor( String name, String phone, String email) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
         Instructor instructor = new Instructor(0, 0, name, phone, email);
         repository.insert(instructor);

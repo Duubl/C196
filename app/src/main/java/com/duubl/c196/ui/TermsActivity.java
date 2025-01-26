@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class TermsActivity extends AppCompatActivity {
 
@@ -71,13 +72,13 @@ public class TermsActivity extends AppCompatActivity {
         repository = new Repository(getApplication());
         try {
             terms = repository.getAllTerms();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Log.e("TermsActivity", "there are no terms!");
             throw new RuntimeException(e);
         }
         try {
             populateTermCards();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
@@ -86,8 +87,6 @@ public class TermsActivity extends AppCompatActivity {
      * Opens the input dialog for the new term information.
      * Accepts input for a name, start, end dates and a list of courses.
      */
-
-    // TODO: Add the ability to add courses to the term
 
     private void openInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -157,7 +156,7 @@ public class TermsActivity extends AppCompatActivity {
             List<Course> courses;
             try {
                 courses = repository.getAllCourses();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
             String[] courseOptions = new String[courses.size()];
@@ -174,6 +173,8 @@ public class TermsActivity extends AppCompatActivity {
                     .setItems(courseOptions, (dialog, which) -> {
                         newTermCourseButton.setText(courseOptions[which]);
                         assignedCourses.add(courses.get(which));
+                        Log.d("TermsActivity", "Got course to be assigned: " + courses.get(which).getCourseName());
+                        Log.d("TermsActivity", "assignedCourses: " + assignedCourses.get(0).getCourseName());
                     })
                     .create()
                     .show();
@@ -192,12 +193,12 @@ public class TermsActivity extends AppCompatActivity {
 
             try {
                 createNewTerm(termName, localStartDate[0], localEndDate[0], assignedCourses);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
             try {
                 populateTermCards();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -215,20 +216,24 @@ public class TermsActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void createNewTerm(String name, LocalDate startDate, LocalDate endDate, List<Course> courses) throws InterruptedException {
+    private void createNewTerm(String name, LocalDate startDate, LocalDate endDate, List<Course> courses) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
 
-        // TODO: Allow for automatically generated course IDs instead of using 0.
-        // Replace int value to be an Integer and have it auto generate.
         Term term = new Term(0, name, startDate, endDate);
-        for (Course course : courses) {
-            course.setCourseID(course.getCourseID());
+
+        long generatedID = repository.insert(term);
+
+        if (generatedID <= 0) {return;
         }
-        repository.insert(term);
+
+        term.setTermID((int) generatedID);
+        for (Course course : courses) {
+            course.setTermID(term.getTermID());
+            repository.update(course);}
         terms.add(term);
     }
 
-    private void createTermButton(Term term) throws InterruptedException {
+    private void createTermButton(Term term) throws InterruptedException, ExecutionException {
         LinearLayout parentLayout = findViewById(R.id.term_list_layout);
         parentLayout.setPadding(parentLayout.getPaddingLeft(),
                 parentLayout.getPaddingTop(),
@@ -297,6 +302,8 @@ public class TermsActivity extends AppCompatActivity {
                     startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
                 });
             }
+        } else {
+            Log.d("TermsActivity", "assignedCourses is empty!");
         }
 
         // Button click listener to toggle expandable layout
@@ -326,7 +333,7 @@ public class TermsActivity extends AppCompatActivity {
      * Popuates the term cards in the activity
      */
 
-    private void populateTermCards() throws InterruptedException {
+    private void populateTermCards() throws InterruptedException, ExecutionException {
         if (termLayout != null) {
             termLayout.removeAllViews();
         }

@@ -33,6 +33,7 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class AssessmentsActivity extends AppCompatActivity {
 
@@ -74,7 +75,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         repository = new Repository(getApplication());
         try {
             assessments = repository.getAllAssessments();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Log.e("AssessmentsActivity", "there are no assessments!");
             throw new RuntimeException(e);
         }
@@ -168,7 +169,7 @@ public class AssessmentsActivity extends AppCompatActivity {
 
             try {
                 createNewAssessment(assessmentName, localStartDate[0], localEndDate[0], type[0]);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
             Log.d("AssessmentsActivity", "Sent data to create new assessment " + assessmentName);
@@ -271,7 +272,7 @@ public class AssessmentsActivity extends AppCompatActivity {
 
             try {
                 modifyAssessment(assessment, assessmentName, localStartDate[0], localEndDate[0], type[0]);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
             try {
@@ -292,7 +293,7 @@ public class AssessmentsActivity extends AppCompatActivity {
      * @param endDate the end date of the assessment
      */
 
-    private void createNewAssessment(String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException {
+    private void createNewAssessment(String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
         Assessment assessment = new Assessment(0, name, startDate, endDate, type);
         repository.insert(assessment);
@@ -309,7 +310,7 @@ public class AssessmentsActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void modifyAssessment(Assessment assessment, String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException {
+    private void modifyAssessment(Assessment assessment, String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
         Assessment newAssessment = new Assessment(assessment.getAssessmentID(), name, startDate, endDate, type);
         repository.update(newAssessment);
