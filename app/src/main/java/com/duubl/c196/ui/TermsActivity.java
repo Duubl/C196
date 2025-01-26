@@ -355,7 +355,5 @@ public class TermsActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        // TODO: Populate with information stored in arraylist containing terms
     }
 }
