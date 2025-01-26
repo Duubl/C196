@@ -223,10 +223,10 @@ public class TermsActivity extends AppCompatActivity {
 
         long generatedID = repository.insert(term);
 
-        if (generatedID <= 0) {return;
-        }
+        if (generatedID <= 0) { return; }
 
         term.setTermID((int) generatedID);
+
         for (Course course : courses) {
             course.setTermID(term.getTermID());
             repository.update(course);}

@@ -138,14 +138,11 @@ public class Repository {
      * @throws ExecutionException
      */
 
-    public void insert(Course course) throws InterruptedException, ExecutionException {
-        Callable<Void> task = () -> {
-            course_dao.insert(course);
-            return null;
-        };
-        FutureTask<Void> future = new FutureTask<>(task);
+    public long insert(Course course) throws InterruptedException, ExecutionException {
+        Callable<Long> task = () -> course_dao.insert(course);
+        FutureTask<Long> future = new FutureTask<>(task);
         database_executor.execute(future);
-        future.get();
+        return future.get();
     }
 
     /**
@@ -257,14 +254,11 @@ public class Repository {
      * @throws ExecutionException
      */
 
-    public void insert(Instructor instructor) throws InterruptedException, ExecutionException {
-        Callable<Void> task = () -> {
-            instructor_dao.insert(instructor);
-            return null;
-        };
-        FutureTask<Void> future = new FutureTask<>(task);
+    public long insert(Instructor instructor) throws InterruptedException, ExecutionException {
+        Callable<Long> task = () -> instructor_dao.insert(instructor);
+        FutureTask<Long> future = new FutureTask<>(task);
         database_executor.execute(future);
-        future.get();
+        return future.get();
     }
 
     /**
@@ -339,14 +333,11 @@ public class Repository {
      * @throws ExecutionException
      */
 
-    public void insert(Assessment assessment) throws InterruptedException, ExecutionException {
-        Callable<Void> task = () -> {
-            assessment_dao.insert(assessment);
-            return null;
-        };
-        FutureTask<Void> future = new FutureTask<>(task);
+    public long insert(Assessment assessment) throws InterruptedException, ExecutionException {
+        Callable<Long> task = () -> assessment_dao.insert(assessment);
+        FutureTask<Long> future = new FutureTask<>(task);
         database_executor.execute(future);
-        future.get();
+        return future.get();
     }
 
     /**

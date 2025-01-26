@@ -252,16 +252,22 @@ public class CoursesActivity extends AppCompatActivity {
     private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, List<Instructor> instructors, List<Assessment> assessments) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
 
-        // TODO: Allow for automatically generated course IDs instead of using 0.
-        // Replace int value to be an Integer and have it auto generate.
         Course course = new Course(0, 0, name, startDate, endDate, status);
+
+        long generatedID = repository.insert(course);
+
+        if (generatedID <= 0) { return; }
+
+        course.setCourseID((int) generatedID);
+
         for (Instructor instructor : instructors) {
             instructor.setCourseID(course.getCourseID());
+            repository.update(instructor);
         }
         for (Assessment assessment : assessments) {
             assessment.setCourseID(course.getCourseID());
+            repository.update(assessment);
         }
-        repository.insert(course);
         courses.add(course);
     }
 

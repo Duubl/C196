@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import com.duubl.c196.R;
 import com.duubl.c196.database.Repository;
+import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.Course;
 import com.duubl.c196.entities.Instructor;
 
@@ -155,6 +156,12 @@ public class InstructorsActivity extends AppCompatActivity {
     private void createNewInstructor( String name, String phone, String email) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
         Instructor instructor = new Instructor(0, 0, name, phone, email);
+
+        long generatedID = repository.insert(instructor);
+
+        if (generatedID <= 0 ) { return; }
+
+        instructor.setInstructorID((int) generatedID);
         repository.insert(instructor);
         instructors.add(instructor);
     }

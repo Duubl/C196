@@ -296,7 +296,12 @@ public class AssessmentsActivity extends AppCompatActivity {
     private void createNewAssessment(String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
         Assessment assessment = new Assessment(0, name, startDate, endDate, type);
-        repository.insert(assessment);
+
+        long generatedID = repository.insert(assessment);
+
+        if (generatedID <= 0 ) { return; }
+
+        assessment.setAssessmentID((int) generatedID);
         assessments.add(assessment);
     }
 

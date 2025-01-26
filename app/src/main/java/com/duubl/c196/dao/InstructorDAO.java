@@ -16,7 +16,7 @@ import java.util.List;
 @Dao
 public interface InstructorDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(Instructor instructor);
+    long insert(Instructor instructor);
 
     @Update
     void update(Instructor instructor);

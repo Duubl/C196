@@ -16,7 +16,7 @@ import java.util.List;
 @Dao
 public interface AssessmentDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insert(Assessment assessment);
+    long insert(Assessment assessment);
 
     @Update
     void update(Assessment assessment);
