@@ -281,6 +281,9 @@ public class AssessmentsActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         });
+
+        // TODO: Add button to delete assessment
+
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
@@ -313,6 +316,7 @@ public class AssessmentsActivity extends AppCompatActivity {
      * @param endDate the new end date for the assessment
      * @param type the new type for the assessment
      * @throws InterruptedException
+     * @throws ExecutionException
      */
 
     private void modifyAssessment(Assessment assessment, String name, LocalDate startDate, LocalDate endDate, AssessmentType type) throws InterruptedException, ExecutionException {
@@ -322,6 +326,19 @@ public class AssessmentsActivity extends AppCompatActivity {
         repository.update(newAssessment);
         assessments.remove(assessment);
         assessments.add(newAssessment);
+    }
+
+    /**
+     * Deletes an assessment
+     * @param assessment the assessment to be deleted
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+
+    private void deleteAssessment(Assessment assessment) throws ExecutionException, InterruptedException {
+        repository = new Repository(getApplication());
+        assessments.remove(assessment);
+        repository.delete(assessment);
     }
 
     /**
