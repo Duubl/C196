@@ -354,7 +354,7 @@ public class CoursesActivity extends AppCompatActivity {
         // TODO: Assessments & instructors showing on wrong courses
 
         List<Assessment> assignedAssessments = repository.getAllCourseAssessments(course);
-        if (!assignedInstructors.isEmpty()) {
+        if (!assignedAssessments.isEmpty()) {
             for (Assessment assessment : assignedAssessments) {
                 Button i = new Button(this);
                 i.setText(assessment.getName());
