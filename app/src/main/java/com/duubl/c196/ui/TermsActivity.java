@@ -58,7 +58,7 @@ public class TermsActivity extends AppCompatActivity {
         // Layout for the list of courses.
         termLayout = findViewById(R.id.term_list_layout);
         if (termLayout == null) {
-            Log.e("TermsActivity", "termLayout");
+            Log.e("TermsActivity", "termLayout is null!");
             return;
         }
 
@@ -166,6 +166,8 @@ public class TermsActivity extends AppCompatActivity {
             }
 
             // TODO: Prevent duplicate courses from being assigned to the same term
+
+            // TODO: Disappearing assigned courses.
 
             new AlertDialog.Builder(this)
                     .setTitle("Assign Course")
