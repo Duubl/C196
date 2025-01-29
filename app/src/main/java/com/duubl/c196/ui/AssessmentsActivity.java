@@ -46,6 +46,13 @@ public class AssessmentsActivity extends AppCompatActivity {
     // HashMap to store the expanded states of the cards. Helpful for changing orientation of the phone.
     private HashMap<Integer, Boolean> expandedStates = new HashMap<>();
 
+    /**
+     * Creates the activity. Adds the toolbar and populates the activity with the assessment cards.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -471,6 +478,12 @@ public class AssessmentsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Handles menu item selections.
+     * @param item The menu item that was selected.
+     * @return true to consume the event. If the selected button is not the home button, calls the superclass method.
+     */
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -480,11 +493,21 @@ public class AssessmentsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Saves the expanded state of the assessment cards.
+     * @param outState Bundle in which to place your saved state.
+     */
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("expandedStates", expandedStates);
     }
+
+    /**
+     * Restores the saved instance state.
+     * @param savedInstanceState the data most recently supplied in {@link #onSaveInstanceState}.
+     */
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -498,6 +521,11 @@ public class AssessmentsActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Called the superlcass method when changing configuration.
+     * @param newConfig The new device configuration.
+     */
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
