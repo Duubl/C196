@@ -344,7 +344,7 @@ public class TermsActivity extends AppCompatActivity {
 
         // Creates the button on submit if all fields contain information.
         // TODO: Add error checking and proper formatting checking
-        builder.setPositiveButton("Add", (dialog, which) -> {
+        builder.setPositiveButton("Update Term", (dialog, which) -> {
             String termName = termInput.getText().toString().trim();
             if (termName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
