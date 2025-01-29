@@ -3,6 +3,7 @@ package com.duubl.c196.entities;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity(tableName = "courses")
 public class Course {
@@ -71,5 +72,18 @@ public class Course {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Course course = (Course) obj;
+        return Objects.equals(courseID, course.courseID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(courseID);
     }
 }

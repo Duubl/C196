@@ -95,8 +95,8 @@ public class AssessmentsActivity extends AppCompatActivity {
     }
 
     /**
-     * Opens the input dialog for adding a new instructor.
-     * Takes input from the user for the name, phone number and address for the instructor.
+     * Opens the input dialog for adding a new assessment.
+     * Takes input from the user for the name, start and end date and type of assessment.
      */
 
     private void openInputDialog() {
@@ -193,8 +193,8 @@ public class AssessmentsActivity extends AppCompatActivity {
     }
 
     /**
-     * Opens the input dialog for adding a new instructor.
-     * Takes input from the user for the name, phone number and address for the instructor.
+     * Opens the input dialog for modifying an assessment
+     * Takes input from the user for the name, start and end dates and the assessment type.
      * @param assessment the assessment being modified
      */
 

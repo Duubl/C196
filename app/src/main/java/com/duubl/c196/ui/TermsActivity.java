@@ -219,6 +219,155 @@ public class TermsActivity extends AppCompatActivity {
     }
 
     /**
+     * Opens the input dialog for the new term information.
+     * Accepts input for a name, start, end dates and a list of courses.
+     */
+
+    private void openInputDialog(Term term) throws ExecutionException, InterruptedException {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Modify Term");
+
+        List<Course> assignedCourses = repository.getAllTermCourses(term);
+
+        LinearLayout inputLayout = new LinearLayout(this);
+        inputLayout.setOrientation(LinearLayout.VERTICAL);
+        inputLayout.setPadding(16, 16, 16, 16);
+
+        final EditText termInput = new EditText(this);
+        termInput.setHint("Term Name");
+        termInput.setText(term.getTermName());
+        inputLayout.addView(termInput);
+
+        final Button startDateButton = new Button(this);
+        startDateButton.setText(term.getStartDate().toString());
+        inputLayout.addView(startDateButton);
+
+        final LocalDate[] localStartDate = new LocalDate[1];
+        localStartDate[0] = term.getStartDate();
+        startDateButton.setOnClickListener(v -> {
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localStartDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                startDateButton.setText(localStartDate[0].toString());
+            }, year, month, day).show();
+        });
+
+        final Button endDateButton = new Button(this);
+        endDateButton.setText(term.getEndDate().toString());
+        inputLayout.addView(endDateButton);
+
+        final LocalDate[] localEndDate = new LocalDate[1];
+        localEndDate[0] = term.getEndDate();
+        endDateButton.setOnClickListener(v -> {
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localEndDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                endDateButton.setText(localEndDate[0].toString());
+            }, year, month, day).show();
+        });
+
+        // Creates the new term course button
+        final Button newTermCourseButton = new Button(this);
+
+        // Changes the name depending on which courses are assigned to the term
+        StringBuilder newTermCourseButtonText = new StringBuilder("Assigned Courses:\n");
+        for (Course assignedCourse : assignedCourses) {
+            newTermCourseButtonText.append(assignedCourse.getCourseName()).append(",\n");
+        }
+        newTermCourseButtonText.setLength(newTermCourseButtonText.length() - 2);
+        newTermCourseButton.setText(newTermCourseButtonText.toString());
+
+        inputLayout.addView(newTermCourseButton);
+
+        newTermCourseButton.setOnClickListener(v -> {
+            List<Course> courses;
+            try {
+                courses = repository.getAllCourses();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+
+            String[] courseOptions = new String[courses.size()];
+            for (int i = 0; i < courses.size(); i++) {
+                courseOptions[i] = courses.get(i).getCourseName();
+            }
+
+
+            // Pre-selects the already assigned courses.
+            boolean[] selectedItems = new boolean[courseOptions.length];
+
+            for (int i = 0; i < courses.size(); i++) {
+                if (assignedCourses.contains(courses.get(i))) {
+                    selectedItems[i] = true;
+                }
+            }
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Assign Courses")
+                    .setMultiChoiceItems(courseOptions, selectedItems, (dialog, which, isChecked) -> {
+                        selectedItems[which] = isChecked;
+                    })
+                    .setPositiveButton("Save", (dialog, which) -> {
+                        assignedCourses.clear();
+                        for (int i = 0; i < selectedItems.length; i++) {
+                            if (selectedItems[i]) {
+                                if (!assignedCourses.contains(courses.get(i))) {
+                                    assignedCourses.add(courses.get(i));
+                                    Log.d("TermsActivity", "Assigned course: " + courses.get(i).getCourseName());
+                                }
+                            }
+                        }
+
+                        if (!assignedCourses.isEmpty()) {
+                            StringBuilder buttonText = new StringBuilder("Assigned Courses:\n");
+                            for (Course assignedCourse : assignedCourses) {
+                                buttonText.append(assignedCourse.getCourseName()).append(",\n");
+                            }
+                            buttonText.setLength(buttonText.length() - 2);
+                            newTermCourseButton.setText(buttonText.toString());
+                        } else {
+                            newTermCourseButton.setText("Assign Courses");
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                    .show();
+        });
+
+        builder.setView(inputLayout);
+
+        // Creates the button on submit if all fields contain information.
+        // TODO: Add error checking and proper formatting checking
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String termName = termInput.getText().toString().trim();
+            if (termName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                modifyTerm(term, termName, localStartDate[0], localEndDate[0], assignedCourses);
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                populateTermCards();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    /**
      * Creates a new term.
      * @param name the name of the term.
      * @param startDate the start date of the term.
@@ -243,6 +392,45 @@ public class TermsActivity extends AppCompatActivity {
             repository.update(course);
         }
         terms.add(term);
+    }
+
+    /**
+     * Modifies a term
+     * @param term the term being modified
+     * @param name the new name for the term
+     * @param startDate the new start date for the term
+     * @param endDate the new end date for the term
+     * @param courses the list of courses currently assigned to the term
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+
+    private void modifyTerm(Term term, String name, LocalDate startDate, LocalDate endDate, List<Course> courses) throws ExecutionException, InterruptedException {
+        repository = new Repository(getApplication());
+
+        List<Course> allCourses = repository.getAllCourses();
+        List<Course> allTermCourses = repository.getAllTermCourses(term);
+
+        Term newTerm = new Term(term.getTermID(), name, startDate, endDate);
+        newTerm.setTermID(term.getTermID());
+
+        for (Course course : allTermCourses) {
+            if (!courses.contains(course) && allTermCourses.contains(course)) {
+                course.setTermID(0);
+            }
+            repository.update(course);
+        }
+
+        for (Course course : allCourses) {
+            if (courses.contains(course)) {
+                course.setTermID(term.getTermID());
+            }
+            repository.update(course);
+        }
+
+        repository.update(newTerm);
+        terms.remove(term);
+        terms.add(newTerm);
     }
 
     /**
@@ -321,8 +509,6 @@ public class TermsActivity extends AppCompatActivity {
                     startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
                 });
             }
-        } else {
-            Log.d("TermsActivity", "assignedCourses is empty!");
         }
 
         // Button click listener to toggle expandable layout
@@ -335,6 +521,15 @@ public class TermsActivity extends AppCompatActivity {
                 parentLayout.requestLayout();
                 parentLayout.invalidate();
             });
+        });
+
+        termButton.setOnLongClickListener(v -> {
+            try {
+                openInputDialog(term);
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
         });
 
         // Add button and expandable layout to the card layout
