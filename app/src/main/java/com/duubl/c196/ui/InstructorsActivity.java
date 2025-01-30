@@ -204,6 +204,24 @@ public class InstructorsActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         });
+
+        builder.setPositiveButton("Delete Instructor", (dialog, which) -> {
+            AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(this);
+            deleteBuilder.setTitle("You Sure, Bud?");
+            deleteBuilder.setNegativeButton("Cancel", (z, x) -> {
+                dialog.cancel();
+            });
+            deleteBuilder.setPositiveButton("Confirm", (d, w) -> {
+                try {
+                    deleteInstructor(instructor);
+                    populateInstructorCards();
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            deleteBuilder.show();
+        });
+
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
@@ -248,6 +266,19 @@ public class InstructorsActivity extends AppCompatActivity {
         repository.update(newInstructor);
         instructors.remove(instructor);
         instructors.add(newInstructor);
+    }
+
+    /**
+     * Deletes a given instructor
+     * @param instructor the instructor to be removed
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+
+    private void deleteInstructor(Instructor instructor) throws ExecutionException, InterruptedException {
+        repository = new Repository(getApplication());
+        repository.delete(instructor);
+        instructors.remove(instructor);
     }
 
     /**
