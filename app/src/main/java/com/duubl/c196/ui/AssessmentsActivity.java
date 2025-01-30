@@ -331,6 +331,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         repository = new Repository(getApplication());
         Assessment newAssessment = new Assessment(assessment.getAssessmentID(), name, startDate, endDate, type);
         newAssessment.setCourseID(assessment.getCourseID());
+
         repository.update(newAssessment);
         assessments.remove(assessment);
         assessments.add(newAssessment);

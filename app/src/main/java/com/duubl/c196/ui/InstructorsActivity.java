@@ -217,7 +217,7 @@ public class InstructorsActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void createNewInstructor( String name, String phone, String email) throws InterruptedException, ExecutionException {
+    private void createNewInstructor(String name, String phone, String email) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
         Instructor instructor = new Instructor(0, 0, name, phone, email);
 
@@ -235,7 +235,7 @@ public class InstructorsActivity extends AppCompatActivity {
         Instructor newInstructor = new Instructor(instructor.getInstructorID(), instructor.getCourseID(), name, phone, email);
         newInstructor.setInstructorID(instructor.getInstructorID());
 
-        repository.update(instructor);
+        repository.update(newInstructor);
         instructors.remove(instructor);
         instructors.add(newInstructor);
     }
