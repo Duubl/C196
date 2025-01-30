@@ -4,6 +4,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity(tableName = "terms")
 public class Term {
@@ -43,5 +44,18 @@ public class Term {
 
     public LocalDate getEndDate() {
         return endDate;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Term term = (Term) obj;
+        return Objects.equals(termID, term.termID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(termID);
     }
 }

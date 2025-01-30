@@ -298,7 +298,6 @@ public class TermsActivity extends AppCompatActivity {
                 courseOptions[i] = courses.get(i).getCourseName();
             }
 
-
             // Pre-selects the already assigned courses.
             boolean[] selectedItems = new boolean[courseOptions.length];
 
@@ -319,7 +318,6 @@ public class TermsActivity extends AppCompatActivity {
                             if (selectedItems[i]) {
                                 if (!assignedCourses.contains(courses.get(i))) {
                                     assignedCourses.add(courses.get(i));
-                                    Log.d("TermsActivity", "Assigned course: " + courses.get(i).getCourseName());
                                 }
                             }
                         }

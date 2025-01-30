@@ -3,6 +3,8 @@ package com.duubl.c196.entities;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 @Entity(tableName = "instructors")
 public class Instructor {
     @PrimaryKey(autoGenerate = true)
@@ -59,5 +61,18 @@ public class Instructor {
 
     public void setInstructorEmail(String instructorEmail) {
         this.instructorEmail = instructorEmail;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Instructor instructor = (Instructor) obj;
+        return Objects.equals(instructorID, instructor.instructorID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(instructorID);
     }
 }

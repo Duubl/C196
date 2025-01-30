@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
 
 @Entity(tableName = "assessments")
 public class Assessment {
@@ -71,5 +72,18 @@ public class Assessment {
 
     public void setType(AssessmentType type) {
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Assessment assessment = (Assessment) obj;
+        return Objects.equals(assessmentID, assessment.assessmentID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(assessmentID);
     }
 }

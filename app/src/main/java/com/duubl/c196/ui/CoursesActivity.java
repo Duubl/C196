@@ -26,6 +26,7 @@ import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Course;
+import com.duubl.c196.entities.Term;
 
 import java.sql.Array;
 import java.time.LocalDate;
@@ -245,6 +246,242 @@ public class CoursesActivity extends AppCompatActivity {
     }
 
     /**
+     * Opens the input dialog for modifying a course.
+     * Takes input from the user for the name, start & end dates, status and all course instructor information.
+     * @param course the course to be modified.
+     */
+
+    private void openInputDialog(Course course) throws ExecutionException, InterruptedException {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Modify Course");
+
+        List<Instructor> assignedInstructors = repository.getAllCourseInstructors(course);
+        List<Assessment> assignedAssessments = repository.getAllCourseAssessments(course);
+
+        LinearLayout inputLayout = new LinearLayout(this);
+        inputLayout.setOrientation(LinearLayout.VERTICAL);
+        inputLayout.setPadding(16, 16, 16, 16);
+
+        // Get the course name
+        final EditText nameInput = new EditText(this);
+        nameInput.setHint("Course Name");
+        nameInput.setText(course.getCourseName());
+        inputLayout.addView(nameInput);
+
+        final Button startDateButton = new Button(this);
+        startDateButton.setText(course.getStartDate().toString());
+        inputLayout.addView(startDateButton);
+
+        final LocalDate[] localStartDate = new LocalDate[1];
+        localStartDate[0] = course.getStartDate();
+        startDateButton.setOnClickListener(v -> {
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localStartDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                startDateButton.setText(localStartDate[0].toString());
+            }, year, month, day).show();
+        });
+
+        final Button endDateButton = new Button(this);
+        endDateButton.setText(course.getEndDate().toString());
+        inputLayout.addView(endDateButton);
+
+        final LocalDate[] localEndDate = new LocalDate[1];
+        localEndDate[0] = course.getEndDate();
+        endDateButton.setOnClickListener(v -> {
+            LocalDate today = LocalDate.now();
+            int year = today.getYear();
+            int month = today.getMonthValue() - 1;
+            int day = today.getDayOfMonth();
+            new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDayOfMonth) -> {
+                localEndDate[0] = LocalDate.of(selectedYear, selectedMonth + 1, selectedDayOfMonth);
+                endDateButton.setText(localEndDate[0].toString());
+            }, year, month, day).show();
+        });
+
+        final Button courseStatusButton = new Button(this);
+        courseStatusButton.setText(course.getStatus().toString());
+        final Status[] status = new Status[1];
+        status[0] = course.getStatus();
+        inputLayout.addView(courseStatusButton);
+        courseStatusButton.setOnClickListener(v -> {
+            Status[] statuses = Status.values();
+            String[] courseOptions = new String[statuses.length];
+            for (int i = 0; i < statuses.length; i++) {
+                courseOptions[i] = statuses[i].name();
+            }
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Select Course Status")
+                    .setItems(courseOptions, (dialog, which) -> {
+                        courseStatusButton.setText(courseOptions[which]);
+                        status[0] = statuses[which];
+                    })
+                    .create()
+                    .show();
+        });
+
+        // Assigning multiple instructors to one course.
+        final Button newCourseInstructorButton = new Button(this);
+
+        StringBuilder newCourseInstructorButtonText = new StringBuilder("Assigned Instructors:\n");
+        for (Instructor assignedInstructor: assignedInstructors) {
+            newCourseInstructorButtonText.append(assignedInstructor.getInstructorName()).append(",\n");
+        }
+        newCourseInstructorButtonText.setLength(newCourseInstructorButtonText.length() - 2);
+        newCourseInstructorButton.setText(newCourseInstructorButtonText.toString());
+
+        inputLayout.addView(newCourseInstructorButton);
+
+        newCourseInstructorButton.setOnClickListener(v -> {
+            List<Instructor> instructors;
+            try {
+                instructors = repository.getAllInstructors();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+
+            String[] instructorOptions = new String[instructors.size()];
+            for (int i = 0; i < instructors.size(); i++) {
+                instructorOptions[i] = instructors.get(i).getInstructorName();
+            }
+
+            // Pre-selects the already assigned instructors.
+            boolean[] selectedItems = new boolean[instructorOptions.length];
+
+            for (int i = 0; i < instructors.size(); i++) {
+                if (assignedInstructors.contains(instructors.get(i))) {
+                    selectedItems[i] = true;
+                }
+            }
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Assign Instructors")
+                    .setMultiChoiceItems(instructorOptions, selectedItems, (dialog, which, isChecked) -> {
+                        selectedItems[which] = isChecked;
+                    })
+                    .setPositiveButton("Save", (dialog, which) -> {
+                        assignedInstructors.clear();
+                        for (int i = 0; i < selectedItems.length; i++) {
+                            if (selectedItems[i]) {
+                                if (!assignedInstructors.contains(instructors.get(i))) {
+                                    assignedInstructors.add(instructors.get(i));
+                                }
+                            }
+                        }
+
+                        if (!assignedInstructors.isEmpty()) {
+                            StringBuilder buttonText = new StringBuilder("Assigned Instructors:\n");
+                            for (Instructor assignedInstructor : assignedInstructors) {
+                                buttonText.append(assignedInstructor.getInstructorName()).append(",\n");
+                            }
+                            buttonText.setLength(buttonText.length() - 2);
+                            newCourseInstructorButton.setText(buttonText.toString());
+                        } else {
+                            newCourseInstructorButton.setText("Assign Instructors");
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                    .show();
+        });
+
+        // Assigning multiple assessments to one course
+        final Button newCourseAssessmentButton = new Button(this);
+
+        StringBuilder newCourseAssessmentButtonText = new StringBuilder("Assigned Assessments:\n");
+        for (Assessment assignedAssessment : assignedAssessments) {
+            newCourseAssessmentButtonText.append(assignedAssessment.getName()).append(",\n");
+        }
+        newCourseAssessmentButtonText.setLength(newCourseAssessmentButtonText.length() - 2);
+        newCourseAssessmentButton.setText(newCourseAssessmentButtonText.toString());
+
+        inputLayout.addView(newCourseAssessmentButton);
+
+        newCourseAssessmentButton.setOnClickListener(v -> {
+            List<Assessment> assessments;
+            try {
+                assessments = repository.getAllAssessments();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+
+            String[] assessmentOptions = new String[assessments.size()];
+            for (int i = 0; i < assessments.size(); i++) {
+                assessmentOptions[i] = assessments.get(i).getName();
+            }
+
+            // Pre-selects the already assigned assessments.
+            boolean[] selectedItems = new boolean[assessmentOptions.length];
+
+            for (int i = 0; i < assessments.size(); i++) {
+                if (assignedAssessments.contains(assessments.get(i))) {
+                    selectedItems[i] = true;
+                }
+            }
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Assign Assessments")
+                    .setMultiChoiceItems(assessmentOptions, selectedItems, (dialog, which, isChecked) -> {
+                        selectedItems[which] = isChecked;
+                    })
+                    .setPositiveButton("Save", (dialog, which) -> {
+                        assignedAssessments.clear();
+                        for (int i = 0; i < selectedItems.length; i++) {
+                            if (selectedItems[i]) {
+                                if (!assignedAssessments.contains(assessments.get(i))) {
+                                    assignedAssessments.add(assessments.get(i));
+                                }
+                            }
+                        }
+
+                        if (!assignedAssessments.isEmpty()) {
+                            StringBuilder buttonText = new StringBuilder("Assigned Assessments:\n");
+                            for (Assessment assignedAssessment : assignedAssessments) {
+                                buttonText.append(assignedAssessment.getName()).append(",\n");
+                            }
+                            buttonText.setLength(buttonText.length() - 2);
+                            newCourseAssessmentButton.setText(buttonText.toString());
+                        } else {
+                            newCourseAssessmentButton.setText("Assign Assessments");
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                    .show();
+        });
+
+        builder.setView(inputLayout);
+
+        // Creates the button on submit if all fields contain information.
+        // TODO: Add error checking and proper formatting checking
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String courseName = nameInput.getText().toString().trim();
+            if (courseName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null || status[0] == null || assignedInstructors.isEmpty() || assignedAssessments.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                modifyCourse(course, courseName, localStartDate[0], localEndDate[0], status[0], assignedAssessments, assignedInstructors);
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                populateCourseCards();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    /**
      * Creates a new course
      * @param name the name of the course
      * @param startDate the start date of the course
@@ -275,6 +512,84 @@ public class CoursesActivity extends AppCompatActivity {
             repository.update(assessment);
         }
         courses.add(course);
+    }
+
+    /**
+     * Modifies a course
+     * @param course the course being modified
+     * @param name the new name for the course
+     * @param startDate the new start date for the course
+     * @param endDate the new end date for the course
+     * @param instructors the list of instructors assigned to the course
+     * @param assessments the list of assessments assigned to the course
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+
+    private void modifyCourse(Course course, String name, LocalDate startDate, LocalDate endDate, Status status, List<Assessment> assessments, List<Instructor> instructors) throws ExecutionException, InterruptedException {
+        repository = new Repository(getApplication());
+
+        List<Instructor> allInstructors = repository.getAllInstructors();
+        List<Instructor> allCourseInstructors = repository.getAllCourseInstructors(course);
+
+        List<Assessment> allAssessments = repository.getAllAssessments();
+        List<Assessment> allCourseAssessments = repository.getAllCourseAssessments(course);
+
+        Course newCourse = new Course(course.getCourseID(), course.getTermID(), name, startDate, endDate, status);
+        newCourse.setCourseID(course.getCourseID());
+
+        // Checks if the assessments list is empty. If it is, assign all previously assigned assessments a course ID of 0.
+        if (assessments.isEmpty()) {
+            for (Assessment assessment : allCourseAssessments) {
+                assessment.setCourseID(0);
+                Log.d("CoursesActivity modifyCourse Method", "Assessment " + assessment.getName() + " updated with course ID: " + assessment.getCourseID());
+                repository.update(assessment);
+            }
+        } else {
+            // Else if the assigned assessments list doesn't have an assessment but the total assessments list does, set the assessment course ID to 0.
+            for (Assessment assessment : allCourseAssessments) {
+                if (!assessments.contains(assessment) && allCourseAssessments.contains(assessment)) {
+                    assessment.setCourseID(0);
+                }
+                Log.d("CoursesActivity modifyCourse Method", "Assessment " + assessment.getName() + " updated with course ID: " + assessment.getCourseID());
+                repository.update(assessment);
+            }
+            // For all the assigned assessments, set the assessments course ID to the course ID it is assigned to.
+            for (Assessment assessment : allAssessments) {
+                if (assessments.contains(assessment)) {
+                    assessment.setCourseID(course.getCourseID());
+                }
+                Log.d("CoursesActivity modifyCourse Method", "Assessment " + assessment.getName() + " updated with course ID: " + assessment.getCourseID());
+                repository.update(assessment);
+            }
+        }
+
+        // Checks if the instructor list is empty. If it is, assign all previously assigned instructors a course ID of 0.
+        if (instructors.isEmpty()) {
+            for (Instructor instructor : allCourseInstructors) {
+                instructor.setCourseID(0);
+                repository.update(instructor);
+            }
+        } else {
+            // Else if the assigned instructors list doesn't have an instructor but the total instructor list does, set the instructor course ID to 0.
+            for (Instructor instructor : allCourseInstructors) {
+                if (!instructors.contains(instructor) && allCourseInstructors.contains(instructor)) {
+                    instructor.setCourseID(0);
+                }
+                repository.update(instructor);
+            }
+            // For all the assigned instructors, set the instructors course ID to the course ID it is assigned to.
+            for (Instructor instructor : allInstructors) {
+                if (instructors.contains(instructor)) {
+                    instructor.setCourseID(course.getCourseID());
+                }
+                repository.update(instructor);
+            }
+        }
+
+        repository.update(newCourse);
+        courses.remove(course);
+        courses.add(newCourse);
     }
 
     /**
@@ -379,6 +694,15 @@ public class CoursesActivity extends AppCompatActivity {
                 parentLayout.requestLayout();
                 parentLayout.invalidate();
             });
+        });
+
+        courseButton.setOnLongClickListener(v -> {
+            try {
+                openInputDialog(course);
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
         });
 
         // Add button and expandable layout to the card layout
