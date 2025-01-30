@@ -220,17 +220,22 @@ public class CoursesActivity extends AppCompatActivity {
                     .show();
         });
 
+        final EditText noteInput = new EditText(this);
+        noteInput.setHint("Note (Optional)");
+        inputLayout.addView(noteInput);
+
         // Creates the button on submit if all fields contain information.
         // TODO: Add error checking and proper formatting checking
         builder.setPositiveButton("Add", (dialog, which) -> {
             String courseName = nameInput.getText().toString().trim();
+            String note = noteInput.getText().toString().trim();
             if (courseName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null || status[0] == null || assignedInstructors.isEmpty() || assignedAssessments.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             try {
-                createNewCourse(courseName, localStartDate[0], localEndDate[0], status[0], assignedInstructors, assignedAssessments);
+                createNewCourse(courseName, localStartDate[0], localEndDate[0], status[0], assignedInstructors, assignedAssessments, note);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
@@ -454,19 +459,25 @@ public class CoursesActivity extends AppCompatActivity {
                     .show();
         });
 
+        final EditText noteInput = new EditText(this);
+        noteInput.setHint("Note (Optional)");
+        noteInput.setText(course.getNote());
+        inputLayout.addView(noteInput);
+
         builder.setView(inputLayout);
 
         // Creates the button on submit if all fields contain information.
         // TODO: Add error checking and proper formatting checking
         builder.setPositiveButton("Update Course", (dialog, which) -> {
             String courseName = nameInput.getText().toString().trim();
+            String note = noteInput.getText().toString().trim();
             if (courseName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null || status[0] == null || assignedInstructors.isEmpty() || assignedAssessments.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             try {
-                modifyCourse(course, courseName, localStartDate[0], localEndDate[0], status[0], assignedAssessments, assignedInstructors);
+                modifyCourse(course, courseName, localStartDate[0], localEndDate[0], status[0], assignedAssessments, assignedInstructors, note);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
@@ -492,10 +503,11 @@ public class CoursesActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, List<Instructor> instructors, List<Assessment> assessments) throws InterruptedException, ExecutionException {
+    private void createNewCourse(String name, LocalDate startDate, LocalDate endDate, Status status, List<Instructor> instructors, List<Assessment> assessments, String note) throws InterruptedException, ExecutionException {
         repository = new Repository(getApplication());
 
         Course course = new Course(0, 0, name, startDate, endDate, status);
+        course.setNote(note);
 
         long generatedID = repository.insert(course);
 
@@ -526,7 +538,7 @@ public class CoursesActivity extends AppCompatActivity {
      * @throws InterruptedException
      */
 
-    private void modifyCourse(Course course, String name, LocalDate startDate, LocalDate endDate, Status status, List<Assessment> assessments, List<Instructor> instructors) throws ExecutionException, InterruptedException {
+    private void modifyCourse(Course course, String name, LocalDate startDate, LocalDate endDate, Status status, List<Assessment> assessments, List<Instructor> instructors, String note) throws ExecutionException, InterruptedException {
         repository = new Repository(getApplication());
 
         List<Instructor> allInstructors = repository.getAllInstructors();
@@ -537,6 +549,7 @@ public class CoursesActivity extends AppCompatActivity {
 
         Course newCourse = new Course(course.getCourseID(), course.getTermID(), name, startDate, endDate, status);
         newCourse.setCourseID(course.getCourseID());
+        newCourse.setNote(note);
 
         // Checks if the assessments list is empty. If it is, assign all previously assigned assessments a course ID of 0.
         if (assessments.isEmpty()) {
@@ -679,6 +692,12 @@ public class CoursesActivity extends AppCompatActivity {
                     startActivity(new Intent(getApplicationContext(), AssessmentsActivity.class));
                 });
             }
+        }
+
+        if (course.getNote() != null) {
+            TextView notes = new TextView(this);
+            notes.setText("\nNotes:\n" + course.getNote());
+            expandableLayout.addView(notes);
         }
 
         // Button click listener to toggle expandable layout

@@ -16,6 +16,7 @@ public class Course {
     private LocalDate startDate;
     private LocalDate endDate;
     private Status status;
+    private String note;
 
     public Course(int courseID, int termID, String courseName, LocalDate startDate, LocalDate endDate, Status status) {
         this.courseID = courseID;
@@ -72,6 +73,14 @@ public class Course {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     /**
