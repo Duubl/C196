@@ -360,6 +360,28 @@ public class TermsActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         });
+
+        builder.setNeutralButton("Delete Term", (dialog, which) -> {
+            AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(this);
+            deleteBuilder.setTitle("You Sure, Bud?");
+            deleteBuilder.setNegativeButton("Cancel", (z, x) -> {
+                dialog.cancel();
+            });
+            deleteBuilder.setPositiveButton("Confirm", (d, w) -> {
+                try {
+                    if (assignedCourses.isEmpty()) {
+                        deleteTerm(term);
+                        populateTermCards();
+                    } else {
+                        Toast.makeText(this, "Delete or reassign assigned courses before deleting!", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            deleteBuilder.show();
+        });
+
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
@@ -437,6 +459,19 @@ public class TermsActivity extends AppCompatActivity {
         repository.update(newTerm);
         terms.remove(term);
         terms.add(newTerm);
+    }
+
+    /**
+     * Deletes a given term
+     * @param term the term to be removed
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+
+    private void deleteTerm(Term term) throws ExecutionException, InterruptedException {
+        repository = new Repository(getApplication());
+        repository.delete(term);
+        terms.remove(term);
     }
 
     /**
