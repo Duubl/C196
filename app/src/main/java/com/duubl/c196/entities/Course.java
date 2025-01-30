@@ -74,6 +74,12 @@ public class Course {
         this.status = status;
     }
 
+    /**
+     * Tests for equivalence using the course ID.
+     * @param obj the object being tested
+     * @return true when both IDs are the same.
+     */
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -81,6 +87,10 @@ public class Course {
         Course course = (Course) obj;
         return Objects.equals(courseID, course.courseID);
     }
+
+    /**
+     * @return the objects hash code, which is set to the ID.
+     */
 
     @Override
     public int hashCode() {

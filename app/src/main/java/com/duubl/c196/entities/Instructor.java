@@ -63,6 +63,12 @@ public class Instructor {
         this.instructorEmail = instructorEmail;
     }
 
+    /**
+     * Tests for equivalence using the instructor ID.
+     * @param obj the object being tested
+     * @return true when both IDs are the same.
+     */
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -70,6 +76,10 @@ public class Instructor {
         Instructor instructor = (Instructor) obj;
         return Objects.equals(instructorID, instructor.instructorID);
     }
+
+    /**
+     * @return the objects hash code, which is set to the ID.
+     */
 
     @Override
     public int hashCode() {

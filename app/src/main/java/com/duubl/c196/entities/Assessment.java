@@ -74,6 +74,12 @@ public class Assessment {
         this.type = type;
     }
 
+    /**
+     * Tests for equivalence using the assessment ID.
+     * @param obj the object being tested
+     * @return true when both IDs are the same.
+     */
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -81,6 +87,10 @@ public class Assessment {
         Assessment assessment = (Assessment) obj;
         return Objects.equals(assessmentID, assessment.assessmentID);
     }
+
+    /**
+     * @return the objects hash code, which is set to the ID.
+     */
 
     @Override
     public int hashCode() {
