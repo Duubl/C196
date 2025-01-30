@@ -414,18 +414,26 @@ public class TermsActivity extends AppCompatActivity {
         Term newTerm = new Term(term.getTermID(), name, startDate, endDate);
         newTerm.setTermID(term.getTermID());
 
-        for (Course course : allTermCourses) {
-            if (!courses.contains(course) && allTermCourses.contains(course)) {
+        if (courses.isEmpty()) {
+            for (Course course : allTermCourses) {
                 course.setTermID(0);
+                repository.update(course);
             }
-            repository.update(course);
-        }
+        } else {
 
-        for (Course course : allCourses) {
-            if (courses.contains(course)) {
-                course.setTermID(term.getTermID());
+            for (Course course : allTermCourses) {
+                if (!courses.contains(course) && allTermCourses.contains(course)) {
+                    course.setTermID(0);
+                }
+                repository.update(course);
             }
-            repository.update(course);
+
+            for (Course course : allCourses) {
+                if (courses.contains(course)) {
+                    course.setTermID(term.getTermID());
+                }
+                repository.update(course);
+            }
         }
 
         repository.update(newTerm);
