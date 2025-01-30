@@ -290,7 +290,22 @@ public class AssessmentsActivity extends AppCompatActivity {
             }
         });
 
-        // TODO: Add button to delete assessment
+        builder.setNeutralButton("Delete Assessment", (dialog, which) -> {
+            AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(this);
+            deleteBuilder.setTitle("You Sure, Bud?");
+            deleteBuilder.setNegativeButton("Cancel", (z, x) -> {
+                dialog.cancel();
+            });
+            deleteBuilder.setPositiveButton("Confirm", (d, w) -> {
+                try {
+                    deleteAssessment(assessment);
+                    populateAssessmentCards();
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            deleteBuilder.show();
+        });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
@@ -338,16 +353,16 @@ public class AssessmentsActivity extends AppCompatActivity {
     }
 
     /**
-     * Deletes an assessment
-     * @param assessment the assessment to be deleted
+     * Deletes a given assessment
+     * @param assessment the assessment to be removed
      * @throws ExecutionException
      * @throws InterruptedException
      */
 
     private void deleteAssessment(Assessment assessment) throws ExecutionException, InterruptedException {
         repository = new Repository(getApplication());
-        assessments.remove(assessment);
         repository.delete(assessment);
+        assessments.remove(assessment);
     }
 
     /**
