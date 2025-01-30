@@ -230,6 +230,16 @@ public class InstructorsActivity extends AppCompatActivity {
         instructors.add(instructor);
     }
 
+    /**
+     * Modifies an instructor
+     * @param instructor the instructor to be modified
+     * @param name the name of the instructor
+     * @param phone the phone number of the instructor
+     * @param email the email of the instructor
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+
     private void modifyInstructor(Instructor instructor, String name, String phone, String email) throws ExecutionException, InterruptedException {
         repository = new Repository(getApplication());
         Instructor newInstructor = new Instructor(instructor.getInstructorID(), instructor.getCourseID(), name, phone, email);
