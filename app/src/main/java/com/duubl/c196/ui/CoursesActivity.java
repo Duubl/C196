@@ -487,6 +487,32 @@ public class CoursesActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         });
+
+        builder.setNeutralButton("Delete Course", (dialog, which) -> {
+            AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(this);
+            deleteBuilder.setTitle("You Sure, Bud?");
+            deleteBuilder.setNegativeButton("Cancel", (z, x) -> {
+                dialog.cancel();
+            });
+            deleteBuilder.setPositiveButton("Confirm", (d, w) -> {
+                try {
+                    if (assignedAssessments.isEmpty() && assignedInstructors.isEmpty()) {
+                        deleteCourse(course);
+                        populateCourseCards();
+                    } else if (!assignedAssessments.isEmpty() && assignedInstructors.isEmpty()) {
+                        Toast.makeText(this, "Delete or reassign assigned assessments before deleting!", Toast.LENGTH_SHORT).show();
+                    } else if (!assignedInstructors.isEmpty() && assignedAssessments.isEmpty()) {
+                        Toast.makeText(this, "Delete or reassign assigned instructors before deleting!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Delete or reassign assigned instructors & assessments before deleting!", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            deleteBuilder.show();
+        });
+
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
@@ -600,6 +626,19 @@ public class CoursesActivity extends AppCompatActivity {
         repository.update(newCourse);
         courses.remove(course);
         courses.add(newCourse);
+    }
+
+    /**
+     * Deletes a given course
+     * @param course the course to be removed
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+
+    private void deleteCourse(Course course) throws ExecutionException, InterruptedException {
+        repository = new Repository(getApplication());
+        repository.delete(course);
+        courses.remove(course);
     }
 
     /**
