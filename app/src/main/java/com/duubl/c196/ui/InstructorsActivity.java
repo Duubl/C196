@@ -205,7 +205,7 @@ public class InstructorsActivity extends AppCompatActivity {
             }
         });
 
-        builder.setPositiveButton("Delete Instructor", (dialog, which) -> {
+        builder.setNeutralButton("Delete Instructor", (dialog, which) -> {
             AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(this);
             deleteBuilder.setTitle("You Sure, Bud?");
             deleteBuilder.setNegativeButton("Cancel", (z, x) -> {
