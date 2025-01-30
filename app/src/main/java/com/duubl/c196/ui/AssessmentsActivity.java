@@ -271,7 +271,7 @@ public class AssessmentsActivity extends AppCompatActivity {
 
         // Creates the button on submit if all fields contain information.
         // TODO: Add error checking and proper formatting checking
-        builder.setPositiveButton("Save", (dialog, which) -> {
+        builder.setPositiveButton("Update Assessment", (dialog, which) -> {
             String assessmentName = nameInput.getText().toString().trim();
             if (assessmentName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();

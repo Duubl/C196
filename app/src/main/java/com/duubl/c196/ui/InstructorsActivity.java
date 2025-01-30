@@ -120,8 +120,6 @@ public class InstructorsActivity extends AppCompatActivity {
         emailInput.setHint("Instructor's Email Address");
         inputLayout.addView(emailInput);
 
-        // TODO: Add ability to add instructor to a course
-
         builder.setView(inputLayout);
 
         // Creates the button on submit if all fields contain information.
@@ -140,7 +138,66 @@ public class InstructorsActivity extends AppCompatActivity {
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
-            Log.d("InstructorsActivity", "Sent data to create new instructor " + instructorName);
+            try {
+                populateInstructorCards();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    /**
+     * Opens the input dialog for modifying an instructor
+     * Takes input from the user for the name, phone number and address for the instructor.
+     */
+
+    private void openInputDialog(Instructor instructor) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Modify Instructor");
+
+        LinearLayout inputLayout = new LinearLayout(this);
+        inputLayout.setOrientation(LinearLayout.VERTICAL);
+        inputLayout.setPadding(16, 16, 16, 16);
+
+        // Get the instructor name
+        final EditText nameInput = new EditText(this);
+        nameInput.setHint("Instructor Name");
+        nameInput.setText(instructor.getInstructorName());
+        inputLayout.addView(nameInput);
+
+        // Get instructor phone number
+        final EditText phoneInput = new EditText(this);
+        phoneInput.setHint("Instructor's Phone Number");
+        phoneInput.setText(instructor.getInstructorPhone());
+        inputLayout.addView(phoneInput);
+
+        // Get instructor email address
+        final EditText emailInput = new EditText(this);
+        emailInput.setHint("Instructor's Email Address");
+        emailInput.setText(instructor.getInstructorEmail());
+        inputLayout.addView(emailInput);
+
+        builder.setView(inputLayout);
+
+        // Creates the button on submit if all fields contain information.
+        // TODO: Add error checking and proper formatting checking
+        builder.setPositiveButton("Update Instructor", (dialog, which) -> {
+            String instructorName = nameInput.getText().toString().trim();
+            String instructorPhone = phoneInput.getText().toString().trim();
+            String instructorEmail = emailInput.getText().toString().trim();
+            if (instructorName.isEmpty() || instructorPhone.isEmpty() || instructorEmail.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            try {
+                modifyInstructor(instructor, instructorName, instructorPhone, instructorEmail);
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
             try {
                 populateInstructorCards();
             } catch (InterruptedException e) {
@@ -171,6 +228,16 @@ public class InstructorsActivity extends AppCompatActivity {
         instructor.setInstructorID((int) generatedID);
         repository.insert(instructor);
         instructors.add(instructor);
+    }
+
+    private void modifyInstructor(Instructor instructor, String name, String phone, String email) throws ExecutionException, InterruptedException {
+        repository = new Repository(getApplication());
+        Instructor newInstructor = new Instructor(instructor.getInstructorID(), instructor.getCourseID(), name, phone, email);
+        newInstructor.setInstructorID(instructor.getInstructorID());
+
+        repository.update(instructor);
+        instructors.remove(instructor);
+        instructors.add(newInstructor);
     }
 
     /**
@@ -248,6 +315,11 @@ public class InstructorsActivity extends AppCompatActivity {
                 parentLayout.requestLayout();
                 parentLayout.invalidate();
             });
+        });
+
+        instructorButton.setOnLongClickListener(v -> {
+            openInputDialog(instructor);
+            return true;
         });
 
         List<Course> assignedCourses = repository.getAllInstructorCourses(instructor);

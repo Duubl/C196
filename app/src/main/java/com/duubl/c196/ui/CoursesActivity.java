@@ -458,7 +458,7 @@ public class CoursesActivity extends AppCompatActivity {
 
         // Creates the button on submit if all fields contain information.
         // TODO: Add error checking and proper formatting checking
-        builder.setPositiveButton("Add", (dialog, which) -> {
+        builder.setPositiveButton("Update Course", (dialog, which) -> {
             String courseName = nameInput.getText().toString().trim();
             if (courseName.isEmpty() || localStartDate[0] == null || localEndDate[0] == null || status[0] == null || assignedInstructors.isEmpty() || assignedAssessments.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
@@ -542,7 +542,6 @@ public class CoursesActivity extends AppCompatActivity {
         if (assessments.isEmpty()) {
             for (Assessment assessment : allCourseAssessments) {
                 assessment.setCourseID(0);
-                Log.d("CoursesActivity modifyCourse Method", "Assessment " + assessment.getName() + " updated with course ID: " + assessment.getCourseID());
                 repository.update(assessment);
             }
         } else {
@@ -551,7 +550,6 @@ public class CoursesActivity extends AppCompatActivity {
                 if (!assessments.contains(assessment) && allCourseAssessments.contains(assessment)) {
                     assessment.setCourseID(0);
                 }
-                Log.d("CoursesActivity modifyCourse Method", "Assessment " + assessment.getName() + " updated with course ID: " + assessment.getCourseID());
                 repository.update(assessment);
             }
             // For all the assigned assessments, set the assessments course ID to the course ID it is assigned to.
@@ -559,7 +557,6 @@ public class CoursesActivity extends AppCompatActivity {
                 if (assessments.contains(assessment)) {
                     assessment.setCourseID(course.getCourseID());
                 }
-                Log.d("CoursesActivity modifyCourse Method", "Assessment " + assessment.getName() + " updated with course ID: " + assessment.getCourseID());
                 repository.update(assessment);
             }
         }
