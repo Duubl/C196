@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -36,9 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
-
     private Repository repository;
-
+    private LinearLayout termLayout;
     private List<Term> terms;
     private List<Course> courses;
 
@@ -61,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+        // Layout for the list of courses.
+        termLayout = findViewById(R.id.terms_container);
+        if (termLayout == null) {
+            Log.e("MainActivity", "termLayout is null!");
+            return;
+        }
 
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(item -> {
@@ -87,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         repository = new Repository(getApplication());
         try {
             courses = repository.getAllCourses();
+            terms = repository.getAllTerms();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -100,6 +112,77 @@ public class MainActivity extends AppCompatActivity {
         int totalCourses = courses.size();
 
         progressText.setText(completedCount + " Completed / " + totalCourses + " Total");
+
+        try {
+            populateTermCards();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createTermButton(Term term) throws InterruptedException, ExecutionException {
+        LinearLayout parentLayout = findViewById(R.id.terms_container);
+
+        CardView cardView = new CardView(this);
+        cardView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        cardView.setCardElevation(8);
+        cardView.setRadius(16);
+        cardView.setPadding(16, 16, 16, 16);
+        cardView.setUseCompatPadding(true);
+
+        // Create parent LinearLayout inside the CardView
+        LinearLayout cardLayout = new LinearLayout(this);
+        cardLayout.setOrientation(LinearLayout.VERTICAL);
+        cardLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        int completedCount = 0;
+        List<Course> termCourses = repository.getAllTermCourses(term);
+        for (Course course : termCourses) {
+            if (course.getStatus() == Status.COMPLETED) {
+                completedCount++;
+            }
+        }
+        int totalCourses = termCourses.size();
+
+        // Create button
+        Button termButton = new Button(this);
+        termButton.setText(term.getTermName() + "\n" + completedCount + " of " + totalCourses + " courses completed");
+        termButton.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        termButton.setBackgroundColor(ContextCompat.getColor(this, R.color.tertiary));
+        termButton.setTextColor(ContextCompat.getColor(this, R.color.primary_variant));
+
+        // Add button and expandable layout to the card layout
+        cardLayout.addView(termButton);
+
+        // Add card layout to the card view
+        cardView.addView(cardLayout);
+
+        // Add the card view to the parent layout
+        parentLayout.addView(cardView);
+    }
+
+    /**
+     * Popuates the term cards in the activity.
+     */
+
+    private void populateTermCards() throws InterruptedException, ExecutionException {
+        if (termLayout != null) {
+            termLayout.removeAllViews();
+        }
+
+        for (Term term : terms) {
+            createTermButton(term);
+        }
     }
 
     @Override

@@ -64,7 +64,7 @@ public class TermsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        // Layout for the list of courses.
+        // Layout for the list of terms.
         termLayout = findViewById(R.id.term_list_layout);
         if (termLayout == null) {
             Log.e("TermsActivity", "termLayout is null!");
@@ -76,7 +76,7 @@ public class TermsActivity extends AppCompatActivity {
             openInputDialog();
         });
 
-        // Loads the courses into the activity on creation
+        // Loads the terms into the activity on creation
         repository = new Repository(getApplication());
         try {
             terms = repository.getAllTerms();
