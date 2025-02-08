@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -16,18 +18,29 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.duubl.c196.database.Repository;
 import com.duubl.c196.entities.Course;
+import com.duubl.c196.entities.Status;
+import com.duubl.c196.entities.Term;
 import com.duubl.c196.ui.AssessmentsActivity;
 import com.duubl.c196.ui.CoursesActivity;
 import com.duubl.c196.ui.InstructorsActivity;
 import com.duubl.c196.ui.TermsActivity;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
+
+    private Repository repository;
+
+    private List<Term> terms;
+    private List<Course> courses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +83,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        repository = new Repository(getApplication());
+        try {
+            courses = repository.getAllCourses();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        TextView progressText = findViewById(R.id.course_counter);
+        int completedCount = 0;
+        for (Course course : courses) {
+            if (course.getStatus() == Status.COMPLETED) {
+                completedCount++;
+            }
+        }
+        int totalCourses = courses.size();
+
+        progressText.setText(completedCount + " Completed / " + totalCourses + " Total");
     }
 
     @Override
