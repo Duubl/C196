@@ -111,8 +111,11 @@ public class MainActivity extends AppCompatActivity {
         }
         int totalCourses = courses.size();
 
-        progressText.setText(completedCount + " Completed / " + totalCourses + " Total");
-
+        if (completedCount > 1 || completedCount == 0) {
+            progressText.setText(completedCount + " Course Completed / " + totalCourses + " Courses Total");
+        } else {
+            progressText.setText(completedCount + " Courses Completed / " + totalCourses + " Courses Total");
+        }
         try {
             populateTermCards();
         } catch (ExecutionException | InterruptedException e) {
