@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         }
         int totalCourses = courses.size();
 
-        if (completedCount > 1 || completedCount == 0) {
+        if (completedCount == 1) {
             progressText.setText(completedCount + " Course Completed / " + totalCourses + " Courses Total");
         } else {
             progressText.setText(completedCount + " Courses Completed / " + totalCourses + " Courses Total");
@@ -163,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
         ));
         termButton.setBackgroundColor(ContextCompat.getColor(this, R.color.tertiary));
         termButton.setTextColor(ContextCompat.getColor(this, R.color.primary_variant));
+
+        termButton.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), TermsActivity.class));
+        });
 
         // Add button and expandable layout to the card layout
         cardLayout.addView(termButton);

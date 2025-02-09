@@ -13,6 +13,7 @@ constraintlayout = "2.2.0"
 roomRuntime = "2.6.1"
 
 [libraries]
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core" }
 cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 core = { module = "androidx.core:core", version.ref = "core" }
 fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
