@@ -119,6 +119,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creates a new term button.
+     * @param term the term the button is created for.
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+
     private void createTermButton(Term term) throws InterruptedException, ExecutionException {
         LinearLayout parentLayout = findViewById(R.id.terms_container);
 
