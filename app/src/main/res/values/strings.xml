@@ -2,4 +2,7 @@
     <string name="app_name">C196</string>
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
+    <string name="channel_name">SchedulerChannel</string>
+    <string name="channel_description">Scheduler Alerts</string>
+    <string name="channel_id">MEOW</string>
 </resources>
