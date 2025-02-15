@@ -28,6 +28,7 @@ import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Course;
 import com.duubl.c196.entities.Term;
+import com.duubl.c196.util.SchedulerNotificationManager;
 
 import java.sql.Array;
 import java.time.LocalDate;
@@ -551,6 +552,7 @@ public class CoursesActivity extends AppCompatActivity {
             repository.update(assessment);
         }
         courses.add(course);
+        SchedulerNotificationManager.scheduleNotification(this, course);
     }
 
     /**
@@ -627,6 +629,7 @@ public class CoursesActivity extends AppCompatActivity {
         repository.update(newCourse);
         courses.remove(course);
         courses.add(newCourse);
+        SchedulerNotificationManager.scheduleNotification(this, newCourse);
     }
 
     /**

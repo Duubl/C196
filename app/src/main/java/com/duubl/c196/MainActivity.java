@@ -1,7 +1,9 @@
 package com.duubl.c196;
 
+import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -119,24 +121,6 @@ public class MainActivity extends AppCompatActivity {
             populateTermCards();
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Creates a notification channel. Required for API 26+.
-     */
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            String channel_id = getString(R.string.channel_id);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(channel_id, name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
         }
     }
 
