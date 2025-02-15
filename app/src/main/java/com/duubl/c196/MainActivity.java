@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -25,7 +26,10 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.duubl.c196.database.Repository;
+import com.duubl.c196.entities.Assessment;
+import com.duubl.c196.entities.AssessmentType;
 import com.duubl.c196.entities.Course;
+import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Term;
 import com.duubl.c196.ui.AssessmentsActivity;
@@ -34,6 +38,7 @@ import com.duubl.c196.ui.InstructorsActivity;
 import com.duubl.c196.ui.TermsActivity;
 import com.google.android.material.navigation.NavigationView;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -187,6 +192,149 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Prepopulates term, course, assessment and instructor data
+     */
+
+    private void prepopulateData() throws ExecutionException, InterruptedException {
+        repository = new Repository(getApplication());
+
+        // Test term 1 with courses
+        Term term1 = new Term(1,
+                "Test Term 1",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 3, 2));
+        Course course1 = new Course(1,
+                1,
+                "Test Course 1",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 2),
+                Status.IN_PROGRESS);
+        Course course2 = new Course(2,
+                1,
+                "Test Course 2",
+                LocalDate.of(2025, 2, 1),
+                LocalDate.of(2025, 2, 2),
+                Status.PLAN_TO_TAKE);
+        Course course3 = new Course(3,
+                1,
+                "Test Course 3",
+                LocalDate.of(2025, 3, 1),
+                LocalDate.of(2025, 3, 2),
+                Status.PLAN_TO_TAKE);
+        Assessment assessment1 = new Assessment(1,
+                "Test Assessment 1",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 2),
+                AssessmentType.OBJECTIVE);
+        Assessment assessment2 = new Assessment(2,
+                "Test Assessment 2",
+                LocalDate.of(2025, 2, 1),
+                LocalDate.of(2025, 2, 2),
+                AssessmentType.PERFORMANCE);
+        Assessment assessment3 = new Assessment(3,
+                "Test Assessment 3",
+                LocalDate.of(2025, 3, 1),
+                LocalDate.of(2025, 3, 2),
+                AssessmentType.PERFORMANCE);
+        assessment1.setCourseID(1);
+        assessment2.setCourseID(2);
+        assessment3.setCourseID(3);
+        Instructor instructor1 = new Instructor(1,
+                1,
+                "Xi Xinping",
+                "111-111-1111",
+                "Xi@gmail.com");
+        Instructor instructor2 = new Instructor(2,
+                2,
+                "John Cena",
+                "222-222-2222",
+                "John@gmail.com");
+        Instructor instructor3 = new Instructor(3,
+                3,
+                "Ronnie Coleman",
+                "333-333-3333",
+                "yeahbuddy@gmail.com");
+
+        // Test term 2 with courses
+        Term term2 = new Term(2,
+                "Test Term 2",
+                LocalDate.of(2025, 4, 1),
+                LocalDate.of(2025, 6, 2));
+        Course course4 = new Course(4,
+                2,
+                "Test Course 4",
+                LocalDate.of(2025, 4, 1),
+                LocalDate.of(2025, 4, 2),
+                Status.IN_PROGRESS);
+        Course course5 = new Course(5,
+                2,
+                "Test Course 5",
+                LocalDate.of(2025, 5, 1),
+                LocalDate.of(2025, 5, 2),
+                Status.PLAN_TO_TAKE);
+        Course course6 = new Course(6,
+                2,
+                "Test Course 6",
+                LocalDate.of(2025, 6, 1),
+                LocalDate.of(2025, 6, 2),
+                Status.PLAN_TO_TAKE);
+        Assessment assessment4 = new Assessment(4,
+                "Test Assessment 4",
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 1, 2),
+                AssessmentType.OBJECTIVE);
+        Assessment assessment5 = new Assessment(5,
+                "Test Assessment 5",
+                LocalDate.of(2025, 2, 1),
+                LocalDate.of(2025, 2, 2),
+                AssessmentType.PERFORMANCE);
+        Assessment assessment6 = new Assessment(6,
+                "Test Assessment 6",
+                LocalDate.of(2025, 3, 1),
+                LocalDate.of(2025, 3, 2),
+                AssessmentType.PERFORMANCE);
+        assessment4.setCourseID(4);
+        assessment5.setCourseID(5);
+        assessment6.setCourseID(6);
+        Instructor instructor4 = new Instructor(4,
+                4,
+                "Jay Cutler",
+                "555-555-5555",
+                "20eggs@gmail.com");
+        Instructor instructor5 = new Instructor(5,
+                5,
+                "Sam Sulek",
+                "666-666-6666",
+                "backne@gmail.com");
+        Instructor instructor6 = new Instructor(6,
+                6,
+                "Tom Platz",
+                "777-777-7777",
+                "quadfather@gmail.com");
+
+        repository.insert(term1);
+        repository.insert(term2);
+        repository.insert(course1);
+        repository.insert(course2);
+        repository.insert(course3);
+        repository.insert(course4);
+        repository.insert(course5);
+        repository.insert(course6);
+        repository.insert(assessment1);
+        repository.insert(assessment2);
+        repository.insert(assessment3);
+        repository.insert(assessment4);
+        repository.insert(assessment5);
+        repository.insert(assessment6);
+        repository.insert(instructor1);
+        repository.insert(instructor2);
+        repository.insert(instructor3);
+        repository.insert(instructor4);
+        repository.insert(instructor5);
+        repository.insert(instructor6);
+    }
+
+    /**
      * Popuates the term cards in the activity.
      */
 
@@ -201,9 +349,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.extras_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
             return true;
+        }
+        if (item.getItemId() == R.id.prepopulate) {
+            try {
+                prepopulateData();
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
