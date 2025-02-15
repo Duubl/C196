@@ -37,7 +37,13 @@ public class SchedulerNotificationManager {
 
         // Schedule the notification
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if (alarmManager != null) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            alarmManager.set(
+                    AlarmManager.RTC_WAKEUP,
+                    startDate.getTimeInMillis(),
+                    pendingIntent
+            );
+        } else {
             alarmManager.setExact(
                     AlarmManager.RTC_WAKEUP,
                     startDate.getTimeInMillis(),
