@@ -18,7 +18,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.duubl.c196.R;
@@ -27,10 +26,7 @@ import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Course;
-import com.duubl.c196.entities.Term;
-import com.duubl.c196.util.SchedulerNotificationManager;
 
-import java.sql.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -552,7 +548,6 @@ public class CoursesActivity extends AppCompatActivity {
             repository.update(assessment);
         }
         courses.add(course);
-        SchedulerNotificationManager.scheduleNotification(this, course);
     }
 
     /**
@@ -629,7 +624,6 @@ public class CoursesActivity extends AppCompatActivity {
         repository.update(newCourse);
         courses.remove(course);
         courses.add(newCourse);
-        SchedulerNotificationManager.scheduleNotification(this, newCourse);
     }
 
     /**
