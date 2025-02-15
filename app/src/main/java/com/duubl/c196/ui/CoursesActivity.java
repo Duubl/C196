@@ -26,6 +26,7 @@ import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Course;
+import com.duubl.c196.util.NotificationReceiver;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -624,6 +625,7 @@ public class CoursesActivity extends AppCompatActivity {
         repository.update(newCourse);
         courses.remove(course);
         courses.add(newCourse);
+        NotificationReceiver.scheduleNotification(this, newCourse.getStartDate());
     }
 
     /**
