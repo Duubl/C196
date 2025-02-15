@@ -208,19 +208,19 @@ public class MainActivity extends AppCompatActivity {
                 "Test Course 1",
                 LocalDate.of(2025, 1, 1),
                 LocalDate.of(2025, 1, 2),
-                Status.IN_PROGRESS);
+                Status.COMPLETED);
         Course course2 = new Course(2,
                 1,
                 "Test Course 2",
                 LocalDate.of(2025, 2, 1),
                 LocalDate.of(2025, 2, 2),
-                Status.PLAN_TO_TAKE);
+                Status.COMPLETED);
         Course course3 = new Course(3,
                 1,
                 "Test Course 3",
                 LocalDate.of(2025, 3, 1),
                 LocalDate.of(2025, 3, 2),
-                Status.PLAN_TO_TAKE);
+                Status.IN_PROGRESS);
         Assessment assessment1 = new Assessment(1,
                 "Test Assessment 1",
                 LocalDate.of(2025, 1, 1),
@@ -332,6 +332,8 @@ public class MainActivity extends AppCompatActivity {
         repository.insert(instructor4);
         repository.insert(instructor5);
         repository.insert(instructor6);
+
+        populateTermCards();
     }
 
     /**
