@@ -635,7 +635,7 @@ public class CoursesActivity extends AppCompatActivity {
         courses.remove(course);
         courses.add(newCourse);
 
-        // TODO: Change functionality
+        // TODO: Schedule the notification, don't just make one appear
         makeNotification();
     }
 
