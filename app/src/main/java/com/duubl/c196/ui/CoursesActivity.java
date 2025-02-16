@@ -1,8 +1,16 @@
 package com.duubl.c196.ui;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -18,6 +26,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.duubl.c196.R;
@@ -26,7 +36,6 @@ import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Course;
-import com.duubl.c196.util.NotificationReceiver;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -625,7 +634,9 @@ public class CoursesActivity extends AppCompatActivity {
         repository.update(newCourse);
         courses.remove(course);
         courses.add(newCourse);
-        NotificationReceiver.scheduleNotification(this, newCourse.getStartDate());
+
+        // TODO: Change functionality
+        makeNotification();
     }
 
     /**
@@ -769,6 +780,63 @@ public class CoursesActivity extends AppCompatActivity {
 
         // Add the card view to the parent layout
         parentLayout.addView(cardView);
+
+    }
+
+    /**
+     * Displays a notification
+     */
+
+    // TODO: Schedule notifications, add proper data
+
+    public void makeNotification() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(CoursesActivity.this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(CoursesActivity.this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        101);
+            }
+        }
+
+        String channelID = "NOTIFICATION_CHANNEL";
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelID);
+        builder.setSmallIcon(R.drawable.user_icon_rounded)
+                .setContentTitle("Notification Title")
+                .setContentText("Notification text")
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        // Opens the given activity
+        Intent intent = new Intent(getApplicationContext(), CoursesActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        // TODO: Change later to proper data
+        intent.putExtra("data", "test data");
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+                intent,
+                PendingIntent.FLAG_MUTABLE);
+        builder.setContentIntent(pendingIntent);
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            NotificationChannel notificationChannel =
+                    notificationManager.getNotificationChannel(channelID);
+            if (notificationChannel == null) {
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                notificationChannel = new NotificationChannel(channelID,
+                        "Some description",
+                        importance);
+                notificationChannel.setLightColor(Color.GREEN);
+                notificationChannel.enableVibration(true);
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+
+        notificationManager.notify(0, builder.build());
     }
 
     /**
