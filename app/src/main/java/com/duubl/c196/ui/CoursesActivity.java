@@ -800,6 +800,8 @@ public class CoursesActivity extends AppCompatActivity {
             }
         }
 
+        // TODO: Update to have proper title and content
+
         String channelID = "NOTIFICATION_CHANNEL";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelID);
         builder.setSmallIcon(R.drawable.user_icon_rounded)
@@ -809,6 +811,8 @@ public class CoursesActivity extends AppCompatActivity {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         // Opens the given activity
+        // TODO: Should open to the activity and have the course card expanded on click
+
         Intent intent = new Intent(getApplicationContext(), CoursesActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
