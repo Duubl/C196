@@ -41,6 +41,7 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 public class AssessmentsActivity extends AppCompatActivity {
@@ -337,8 +338,8 @@ public class AssessmentsActivity extends AppCompatActivity {
         assessment.setAssessmentID((int) generatedID);
         assessments.add(assessment);
 
-        scheduleAssessmentNotification(assessment.getStartDate(), assessment.getName(), "starts", 2);
-        scheduleAssessmentNotification(assessment.getEndDate(), assessment.getName(), "ends", 3);
+        scheduleAssessmentNotification(assessment.getStartDate(), assessment.getName(), "starts");
+        scheduleAssessmentNotification(assessment.getEndDate(), assessment.getName(), "ends");
     }
 
     /**
@@ -361,8 +362,8 @@ public class AssessmentsActivity extends AppCompatActivity {
         assessments.remove(assessment);
         assessments.add(newAssessment);
 
-        scheduleAssessmentNotification(newAssessment.getStartDate(), newAssessment.getName(), "starts", 2);
-        scheduleAssessmentNotification(newAssessment.getEndDate(), newAssessment.getName(), "ends", 3);
+        scheduleAssessmentNotification(newAssessment.getStartDate(), newAssessment.getName(), "starts");
+        scheduleAssessmentNotification(newAssessment.getEndDate(), newAssessment.getName(), "ends");
     }
 
     /**
@@ -498,10 +499,11 @@ public class AssessmentsActivity extends AppCompatActivity {
      * @param localDate the date the notification is scheduled for.
      * @param name the name of the assessment.
      * @param type a string indicating whether the type of notification is for the start or end of a course.
-     * @param requestCode a unqiue integer to differentiate between different notifications.
      */
 
-    public void scheduleAssessmentNotification(LocalDate localDate, String name, String type, int requestCode) {
+    public void scheduleAssessmentNotification(LocalDate localDate, String name, String type) {
+        Random rand = new Random();
+        int requestCode = (name + type + localDate.toString() + rand.nextInt(50)).hashCode();
         LocalDateTime localDateTime = localDate.atStartOfDay();
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         long triggerTimeMillis = zonedDateTime.toInstant().toEpochMilli();
