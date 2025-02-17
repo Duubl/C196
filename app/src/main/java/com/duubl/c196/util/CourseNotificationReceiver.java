@@ -13,14 +13,17 @@ import androidx.core.app.NotificationCompat;
 import com.duubl.c196.R;
 import com.duubl.c196.ui.CoursesActivity;
 
-public class NotificationReceiver extends BroadcastReceiver {
+public class CourseNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        String type = intent.getStringExtra("COURSE_DATA");
+        String name = intent.getStringExtra("COURSE_NAME");
+
         String channelID = "NOTIFICATION_CHANNEL";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelID)
                 .setSmallIcon(R.drawable.user_icon_rounded)
-                .setContentTitle("Scheduled Notification")
-                .setContentText("This is your scheduled notification.")
+                .setContentTitle(name + " " + type + " today!")
+                .setContentText("Click to view course that " + type + " today!")
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 

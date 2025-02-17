@@ -37,7 +37,7 @@ import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Course;
-import com.duubl.c196.util.NotificationReceiver;
+import com.duubl.c196.util.CourseNotificationReceiver;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -640,8 +640,8 @@ public class CoursesActivity extends AppCompatActivity {
         courses.remove(course);
         courses.add(newCourse);
 
-        // TODO: Schedule the notification, don't just make one appear
-        scheduleNotification(newCourse.getStartDate());
+        scheduleCourseNotification(newCourse.getStartDate(), newCourse.getCourseName(), "starts", 0);
+        scheduleCourseNotification(newCourse.getEndDate(), newCourse.getCourseName(), "ends", 1);
     }
 
     /**
@@ -790,21 +790,23 @@ public class CoursesActivity extends AppCompatActivity {
 
     /**
      * Schedules a notification
+     * @param localDate the date the notification is scheduled for.
+     * @param name the name of the course.
+     * @param type a string indicating whether the type of notification is for the start or end of a course.
+     * @param requestCode a unqiue integer to differentiate between different notifications.
      */
 
-    // TODO: Schedule notifications, add proper data
-
-    public void scheduleNotification(LocalDate localDate) {
-        // Convert the LocalDate to LocalDateTime at start of day (or set a specific time)
+    public void scheduleCourseNotification(LocalDate localDate, String name, String type, int requestCode) {
         LocalDateTime localDateTime = localDate.atStartOfDay();
-        // Convert to ZonedDateTime using the system default time zone
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         long triggerTimeMillis = zonedDateTime.toInstant().toEpochMilli();
 
-        Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
+        Intent intent = new Intent(getApplicationContext(), CourseNotificationReceiver.class);
+        intent.putExtra("COURSE_DATA", type);
+        intent.putExtra("COURSE_NAME", name);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 getApplicationContext(),
-                0,
+                requestCode,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE
         );
@@ -814,7 +816,7 @@ public class CoursesActivity extends AppCompatActivity {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent);
         }
 
-        Toast.makeText(this, "Notification scheduled!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Reminder created for " + localDate, Toast.LENGTH_SHORT).show();
     }
 
     /**
