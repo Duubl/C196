@@ -563,6 +563,9 @@ public class CoursesActivity extends AppCompatActivity {
             repository.update(assessment);
         }
         courses.add(course);
+
+        scheduleCourseNotification(course.getStartDate(), course.getCourseName(), "starts", 0);
+        scheduleCourseNotification(course.getEndDate(), course.getCourseName(), "ends", 1);
     }
 
     /**

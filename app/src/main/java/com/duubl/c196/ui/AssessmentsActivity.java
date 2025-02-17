@@ -1,6 +1,9 @@
 package com.duubl.c196.ui;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -26,11 +29,15 @@ import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.AssessmentType;
 import com.duubl.c196.entities.Course;
 import com.duubl.c196.entities.Instructor;
+import com.duubl.c196.util.AssessmentNotificationReceiver;
+import com.duubl.c196.util.CourseNotificationReceiver;
 
 import org.w3c.dom.Text;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -329,6 +336,9 @@ public class AssessmentsActivity extends AppCompatActivity {
 
         assessment.setAssessmentID((int) generatedID);
         assessments.add(assessment);
+
+        scheduleAssessmentNotification(assessment.getStartDate(), assessment.getName(), "starts", 2);
+        scheduleAssessmentNotification(assessment.getEndDate(), assessment.getName(), "ends", 3);
     }
 
     /**
@@ -350,6 +360,9 @@ public class AssessmentsActivity extends AppCompatActivity {
         repository.update(newAssessment);
         assessments.remove(assessment);
         assessments.add(newAssessment);
+
+        scheduleAssessmentNotification(newAssessment.getStartDate(), newAssessment.getName(), "starts", 2);
+        scheduleAssessmentNotification(newAssessment.getEndDate(), newAssessment.getName(), "ends", 3);
     }
 
     /**
@@ -478,6 +491,37 @@ public class AssessmentsActivity extends AppCompatActivity {
 
         // Add the card view to the parent layout
         parentLayout.addView(cardView);
+    }
+
+    /**
+     * Schedules a notification
+     * @param localDate the date the notification is scheduled for.
+     * @param name the name of the assessment.
+     * @param type a string indicating whether the type of notification is for the start or end of a course.
+     * @param requestCode a unqiue integer to differentiate between different notifications.
+     */
+
+    public void scheduleAssessmentNotification(LocalDate localDate, String name, String type, int requestCode) {
+        LocalDateTime localDateTime = localDate.atStartOfDay();
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        long triggerTimeMillis = zonedDateTime.toInstant().toEpochMilli();
+
+        Intent intent = new Intent(getApplicationContext(), AssessmentNotificationReceiver.class);
+        intent.putExtra("ASSESSMENT_DATA", type);
+        intent.putExtra("ASSESSMENT_NAME", name);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                getApplicationContext(),
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE
+        );
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent);
+        }
+
+        Toast.makeText(this, "Reminder created for " + localDate, Toast.LENGTH_SHORT).show();
     }
 
     /**
