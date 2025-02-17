@@ -30,5 +30,6 @@
         <activity android:name=".ui.InstructorsActivity" />
         <activity android:name=".ui.AssessmentsActivity" />
         <receiver android:name=".util.CourseNotificationReceiver"/>
+        <receiver android:name=".util.AssessmentNotificationReceiver"/>
     </application>
 </manifest>

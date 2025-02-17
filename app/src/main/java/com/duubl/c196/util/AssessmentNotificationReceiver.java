@@ -14,11 +14,17 @@ import com.duubl.c196.R;
 import com.duubl.c196.ui.AssessmentsActivity;
 import com.duubl.c196.ui.CoursesActivity;
 
+import java.util.Random;
+
 public class AssessmentNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        Random rand = new Random();
+
         String type = intent.getStringExtra("ASSESSMENT_DATA");
         String name = intent.getStringExtra("ASSESSMENT_NAME");
+
+        int notificationID = (name + type + rand.nextInt(50)).hashCode();
 
         String channelID = "NOTIFICATION_CHANNEL";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelID)
@@ -42,6 +48,6 @@ public class AssessmentNotificationReceiver extends BroadcastReceiver {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(notificationID, builder.build());
     }
 }

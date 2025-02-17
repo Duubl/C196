@@ -13,11 +13,17 @@ import androidx.core.app.NotificationCompat;
 import com.duubl.c196.R;
 import com.duubl.c196.ui.CoursesActivity;
 
+import java.util.Random;
+
 public class CourseNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        Random rand = new Random();
+
         String type = intent.getStringExtra("COURSE_DATA");
         String name = intent.getStringExtra("COURSE_NAME");
+
+        int notificationID = (name + type + rand.nextInt(50)).hashCode();
 
         String channelID = "NOTIFICATION_CHANNEL";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelID)
@@ -41,6 +47,6 @@ public class CourseNotificationReceiver extends BroadcastReceiver {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(notificationID, builder.build());
     }
 }
