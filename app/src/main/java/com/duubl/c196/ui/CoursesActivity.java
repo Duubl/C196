@@ -1,6 +1,7 @@
 package com.duubl.c196.ui;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -36,8 +37,12 @@ import com.duubl.c196.entities.Assessment;
 import com.duubl.c196.entities.Instructor;
 import com.duubl.c196.entities.Status;
 import com.duubl.c196.entities.Course;
+import com.duubl.c196.util.NotificationReceiver;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -636,7 +641,7 @@ public class CoursesActivity extends AppCompatActivity {
         courses.add(newCourse);
 
         // TODO: Schedule the notification, don't just make one appear
-        makeNotification();
+        scheduleNotification(newCourse.getStartDate());
     }
 
     /**
@@ -784,63 +789,32 @@ public class CoursesActivity extends AppCompatActivity {
     }
 
     /**
-     * Displays a notification
+     * Schedules a notification
      */
 
     // TODO: Schedule notifications, add proper data
 
-    public void makeNotification() {
+    public void scheduleNotification(LocalDate localDate) {
+        // Convert the LocalDate to LocalDateTime at start of day (or set a specific time)
+        LocalDateTime localDateTime = localDate.atStartOfDay();
+        // Convert to ZonedDateTime using the system default time zone
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        long triggerTimeMillis = zonedDateTime.toInstant().toEpochMilli();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(CoursesActivity.this,
-                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(CoursesActivity.this,
-                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                        101);
-            }
-        }
-
-        // TODO: Update to have proper title and content
-
-        String channelID = "NOTIFICATION_CHANNEL";
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelID);
-        builder.setSmallIcon(R.drawable.user_icon_rounded)
-                .setContentTitle("Notification Title")
-                .setContentText("Notification text")
-                .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        // Opens the given activity
-        // TODO: Should open to the activity and have the course card expanded on click
-
-        Intent intent = new Intent(getApplicationContext(), CoursesActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        // TODO: Change later to proper data
-        intent.putExtra("data", "test data");
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+        Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                getApplicationContext(),
+                0,
                 intent,
-                PendingIntent.FLAG_MUTABLE);
-        builder.setContentIntent(pendingIntent);
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE
+        );
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            NotificationChannel notificationChannel =
-                    notificationManager.getNotificationChannel(channelID);
-            if (notificationChannel == null) {
-                int importance = NotificationManager.IMPORTANCE_HIGH;
-                notificationChannel = new NotificationChannel(channelID,
-                        "Some description",
-                        importance);
-                notificationChannel.setLightColor(Color.GREEN);
-                notificationChannel.enableVibration(true);
-                notificationManager.createNotificationChannel(notificationChannel);
-            }
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent);
         }
 
-        notificationManager.notify(0, builder.build());
+        Toast.makeText(this, "Notification scheduled!", Toast.LENGTH_SHORT).show();
     }
 
     /**
