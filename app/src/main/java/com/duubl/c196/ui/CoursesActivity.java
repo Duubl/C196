@@ -527,6 +527,56 @@ public class CoursesActivity extends AppCompatActivity {
             deleteBuilder.show();
         });
 
+        builder.setNeutralButton("Send Course Notes", (dialog, which) -> {
+           AlertDialog.Builder emailDialog = new AlertDialog.Builder(this);
+           emailDialog.setTitle("Send Note Email");
+
+           LinearLayout layout = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.VERTICAL);
+            layout.setPadding(50, 30, 50, 30);
+
+           TextView sendToText = new TextView(this);
+           sendToText.setText("Recipient: ");
+           sendToText.setHint("Enter email recipient");
+
+           EditText sendToTextEdit = new EditText(this);
+
+           TextView subjectText = new TextView(this);
+           subjectText.setText("Subject: ");
+           subjectText.setHint("Enter the email subject");
+           EditText subjectTextEdit = new EditText(this);
+
+            TextView note = new TextView(this);
+            note.setText("Message:");
+            EditText noteEdit = new EditText(this);
+            noteEdit.setText(course.getNote());
+
+            layout.addView(sendToText);
+            layout.addView(sendToTextEdit);
+            layout.addView(subjectText);
+            layout.addView(subjectTextEdit);
+            layout.addView(note);
+            layout.addView(noteEdit);
+
+            emailDialog.setView(layout);
+
+           Intent intent = new Intent(Intent.ACTION_SEND);
+
+           intent.putExtra(Intent.EXTRA_EMAIL, new String[]{String.valueOf(sendToTextEdit)});
+           intent.putExtra(Intent.EXTRA_SUBJECT, String.valueOf(subjectTextEdit));
+           intent.putExtra(Intent.EXTRA_TEXT, String.valueOf(note));
+
+           intent.setType("message/rfc822");
+
+           emailDialog.setNegativeButton("Cancel", (z, x) -> {
+               dialog.cancel();
+           });
+           emailDialog.setPositiveButton("Send", (d, w) -> {
+              startActivity(Intent.createChooser(intent, "Choose an Email Client:"));
+           });
+           emailDialog.show();
+        });
+
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
