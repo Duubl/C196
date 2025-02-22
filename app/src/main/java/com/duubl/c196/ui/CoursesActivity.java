@@ -562,16 +562,20 @@ public class CoursesActivity extends AppCompatActivity {
 
            Intent intent = new Intent(Intent.ACTION_SEND);
 
-           intent.putExtra(Intent.EXTRA_EMAIL, new String[]{String.valueOf(sendToTextEdit)});
-           intent.putExtra(Intent.EXTRA_SUBJECT, String.valueOf(subjectTextEdit));
-           intent.putExtra(Intent.EXTRA_TEXT, String.valueOf(note));
-
            intent.setType("message/rfc822");
 
            emailDialog.setNegativeButton("Cancel", (z, x) -> {
                dialog.cancel();
            });
            emailDialog.setPositiveButton("Send", (d, w) -> {
+               String recipient = sendToTextEdit.getText().toString().trim();
+               String subject = subjectTextEdit.getText().toString().trim();
+               String message = noteEdit.getText().toString().trim();
+
+               intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipient});
+               intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+               intent.putExtra(Intent.EXTRA_TEXT, message);
+
               startActivity(Intent.createChooser(intent, "Choose an Email Client:"));
            });
            emailDialog.show();
