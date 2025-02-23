@@ -286,7 +286,7 @@ public class InstructorsActivity extends AppCompatActivity {
      * @param instructor the instructor to have the button created for
      */
 
-    private void createInstructorButton(Instructor instructor) throws InterruptedException {
+    private void createInstructorButton(Instructor instructor, int selectedInstructorID) throws InterruptedException {
         LinearLayout parentLayout = findViewById(R.id.instructor_list_layout);
         parentLayout.setPadding(parentLayout.getPaddingLeft(),
                 parentLayout.getPaddingTop(),
@@ -325,7 +325,7 @@ public class InstructorsActivity extends AppCompatActivity {
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
         expandableLayout.setOrientation(LinearLayout.VERTICAL);
-        expandableLayout.setVisibility(expandedStates.getOrDefault(instructor.getInstructorID(), false) ? View.VISIBLE : View.GONE);
+        expandableLayout.setVisibility(instructor.getInstructorID() == selectedInstructorID ? View.VISIBLE : View.GONE);
         expandableLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -371,7 +371,9 @@ public class InstructorsActivity extends AppCompatActivity {
                     c.setText(course.getCourseName());
                     expandableLayout.addView(c);
                     c.setOnClickListener(v -> {
-                        startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
+                        Intent intent = new Intent(InstructorsActivity.this, CoursesActivity.class);
+                        intent.putExtra("courseID", course.getCourseID());
+                        startActivity(intent);
                     });
                 }
             } else {
@@ -401,8 +403,11 @@ public class InstructorsActivity extends AppCompatActivity {
             instructorLayout.removeAllViews();
         }
 
+        Intent intent = getIntent();
+        int instructorID = intent.getIntExtra("instructorID", -1);
+
         for (Instructor instructor : instructors) {
-            createInstructorButton(instructor);
+            createInstructorButton(instructor, instructorID);
         }
     }
 

@@ -720,7 +720,7 @@ public class CoursesActivity extends AppCompatActivity {
      * @param course the course to have the button created for
      */
 
-    private void createCourseButton(Course course) throws InterruptedException, ExecutionException {
+    private void createCourseButton(Course course, int selectedCourseID) throws InterruptedException, ExecutionException {
         LinearLayout parentLayout = findViewById(R.id.courses_list_layout);
         parentLayout.setPadding(parentLayout.getPaddingLeft(),
                 parentLayout.getPaddingTop(),
@@ -759,7 +759,7 @@ public class CoursesActivity extends AppCompatActivity {
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
         expandableLayout.setOrientation(LinearLayout.VERTICAL);
-        expandableLayout.setVisibility(expandedStates.getOrDefault(course.getCourseID(), false) ? View.VISIBLE : View.GONE);
+        expandableLayout.setVisibility(course.getCourseID() == selectedCourseID ? View.VISIBLE : View.GONE);
         expandableLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -786,7 +786,9 @@ public class CoursesActivity extends AppCompatActivity {
                 i.setText(instructor.getInstructorName());
                 expandableLayout.addView(i);
                 i.setOnClickListener(v -> {
-                    startActivity(new Intent(getApplicationContext(), InstructorsActivity.class));
+                    Intent intent = new Intent(CoursesActivity.this, InstructorsActivity.class);
+                    intent.putExtra("instructorID", instructor.getInstructorID());
+                    startActivity(intent);
                 });
             }
         }
@@ -802,7 +804,9 @@ public class CoursesActivity extends AppCompatActivity {
                 i.setText(assessment.getName());
                 expandableLayout.addView(i);
                 i.setOnClickListener(v -> {
-                    startActivity(new Intent(getApplicationContext(), AssessmentsActivity.class));
+                    Intent intent = new Intent(CoursesActivity.this, AssessmentsActivity.class);
+                    intent.putExtra("assessmentID", assessment.getAssessmentID());
+                    startActivity(intent);
                 });
             }
         }
@@ -887,8 +891,11 @@ public class CoursesActivity extends AppCompatActivity {
             courseLayout.removeAllViews();
         }
 
+        Intent intent = getIntent();
+        int courseID = intent.getIntExtra("courseID", -1);
+
         for (Course course : courses) {
-            createCourseButton(course);
+            createCourseButton(course, courseID);
         }
     }
 

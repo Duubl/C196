@@ -173,7 +173,9 @@ public class MainActivity extends AppCompatActivity {
         termButton.setTextColor(ContextCompat.getColor(this, R.color.primary_variant));
 
         termButton.setOnClickListener(v -> {
-            startActivity(new Intent(getApplicationContext(), TermsActivity.class));
+            Intent intent = new Intent(MainActivity.this, TermsActivity.class);
+            intent.putExtra("termID", term.getTermID());
+            startActivity(intent);
         });
 
         // Add button and expandable layout to the card layout

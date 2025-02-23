@@ -384,7 +384,7 @@ public class AssessmentsActivity extends AppCompatActivity {
      * @param assessment the assessment to have the button created for
      */
 
-    private void createAssessmentButton(Assessment assessment) throws InterruptedException {
+    private void createAssessmentButton(Assessment assessment, int selectedAssessmentID) throws InterruptedException {
         LinearLayout parentLayout = findViewById(R.id.assessments_list_layout);
         parentLayout.setPadding(parentLayout.getPaddingLeft(),
                 parentLayout.getPaddingTop(),
@@ -423,7 +423,7 @@ public class AssessmentsActivity extends AppCompatActivity {
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
         expandableLayout.setOrientation(LinearLayout.VERTICAL);
-        expandableLayout.setVisibility(expandedStates.getOrDefault(assessment.getAssessmentID(), false) ? View.VISIBLE : View.GONE);
+        expandableLayout.setVisibility(assessment.getAssessmentID() == selectedAssessmentID ? View.VISIBLE : View.GONE);
         expandableLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -473,7 +473,9 @@ public class AssessmentsActivity extends AppCompatActivity {
                     c.setText(course.getCourseName());
                     expandableLayout.addView(c);
                     c.setOnClickListener(v -> {
-                        startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
+                        Intent intent = new Intent(AssessmentsActivity.this, CoursesActivity.class);
+                        intent.putExtra("courseID", course.getCourseID());
+                        startActivity(intent);
                     });
                 }
             } else {
@@ -535,8 +537,11 @@ public class AssessmentsActivity extends AppCompatActivity {
             assessmentLayout.removeAllViews();
         }
 
+        Intent intent = getIntent();
+        int assessmentID = intent.getIntExtra("assessmentID", -1);
+
         for (Assessment assessment : assessments) {
-            createAssessmentButton(assessment);
+            createAssessmentButton(assessment, assessmentID);
         }
     }
 

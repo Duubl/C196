@@ -20,6 +20,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
+import com.duubl.c196.MainActivity;
 import com.duubl.c196.R;
 import com.duubl.c196.database.Repository;
 import com.duubl.c196.entities.Assessment;
@@ -481,7 +482,7 @@ public class TermsActivity extends AppCompatActivity {
      * @throws ExecutionException
      */
 
-    private void createTermButton(Term term) throws InterruptedException, ExecutionException {
+    private void createTermButton(Term term, int selectedTermID) throws InterruptedException, ExecutionException {
         LinearLayout parentLayout = findViewById(R.id.term_list_layout);
         parentLayout.setPadding(parentLayout.getPaddingLeft(),
                 parentLayout.getPaddingTop(),
@@ -520,7 +521,7 @@ public class TermsActivity extends AppCompatActivity {
         // Create expandable section layout
         LinearLayout expandableLayout = new LinearLayout(this);
         expandableLayout.setOrientation(LinearLayout.VERTICAL);
-        expandableLayout.setVisibility(expandedStates.getOrDefault(term.getTermID(), false) ? View.VISIBLE : View.GONE);
+        expandableLayout.setVisibility(term.getTermID() == selectedTermID ? View.VISIBLE : View.GONE);
         expandableLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -547,7 +548,9 @@ public class TermsActivity extends AppCompatActivity {
                 c.setText(course.getCourseName());
                 expandableLayout.addView(c);
                 c.setOnClickListener(v -> {
-                    startActivity(new Intent(getApplicationContext(), CoursesActivity.class));
+                    Intent intent = new Intent(TermsActivity.this, CoursesActivity.class);
+                    intent.putExtra("courseID", course.getCourseID());
+                    startActivity(intent);
                 });
             }
         }
@@ -593,8 +596,11 @@ public class TermsActivity extends AppCompatActivity {
             termLayout.removeAllViews();
         }
 
+        Intent intent = getIntent();
+        int termID = intent.getIntExtra("termID", -1);
+
         for (Term term : terms) {
-            createTermButton(term);
+            createTermButton(term, termID);
         }
     }
 
