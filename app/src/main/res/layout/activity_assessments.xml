@@ -12,7 +12,9 @@
         android:fillViewport="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/new_assessment_button" >
+        app:layout_constraintBottom_toTopOf="@id/new_assessment_button"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:id="@+id/assessments_list_layout"

@@ -12,7 +12,9 @@
         android:fillViewport="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/new_course_button" >
+        app:layout_constraintBottom_toTopOf="@id/new_course_button"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:id="@+id/courses_list_layout"
