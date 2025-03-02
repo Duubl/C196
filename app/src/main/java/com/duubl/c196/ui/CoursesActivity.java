@@ -502,7 +502,7 @@ public class CoursesActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNeutralButton("Delete Course", (dialog, which) -> {
+        builder.setNegativeButton("Delete Course", (dialog, which) -> {
             AlertDialog.Builder deleteBuilder = new AlertDialog.Builder(this);
             deleteBuilder.setTitle("You Sure, Bud?");
             deleteBuilder.setNegativeButton("Cancel", (z, x) -> {
@@ -580,8 +580,6 @@ public class CoursesActivity extends AppCompatActivity {
            });
            emailDialog.show();
         });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
     }
