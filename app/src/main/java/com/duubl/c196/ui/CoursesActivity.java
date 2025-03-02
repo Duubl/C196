@@ -767,6 +767,10 @@ public class CoursesActivity extends AppCompatActivity {
         expandableLayout.setPadding(16, 16, 16, 16);
 
         // Add details to the expandable section
+        TextView statusView = new TextView(this);
+        statusView.setText("Status: " + course.getStatus() + "\n");
+        expandableLayout.addView(statusView);
+
         TextView startTextView = new TextView(this);
         startTextView.setText("Start Date: " + course.getStartDate());
         expandableLayout.addView(startTextView);
