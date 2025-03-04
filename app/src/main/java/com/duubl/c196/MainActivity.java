@@ -330,7 +330,8 @@ public class MainActivity extends AppCompatActivity {
         repository.insert(instructor5);
         repository.insert(instructor6);
 
-        populateTermCards();
+        finish();
+        startActivity(getIntent());
     }
 
     /**
